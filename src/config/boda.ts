@@ -132,7 +132,7 @@ export const boda = {
 
   moodboard: {
     /**
-     * Las 34 referencias, optimizadas en `public/moodboard/`.
+     * Las 35 referencias, optimizadas en `public/moodboard/`.
      *
      * Ninguna se recorta: cada una conserva su proporción real y el mosaico
      * se acomoda alrededor. `ratio` solo le da altura a un hueco cuando `src`
@@ -168,6 +168,11 @@ export const boda = {
         ratio: '3 / 4',
         src: 'moodboard/terciopelo-rosas.jpg',
         alt: 'Mujer de terciopelo negro sobre un mar de telas rojas y rosas',
+      },
+      {
+        ratio: '9 / 16',
+        src: 'moodboard/velas-rojo.jpg',
+        alt: 'Vestido rojo con guantes largos entre un mar de velas escurridas, reflejado en el piso',
       },
       {
         ratio: '4 / 5',
