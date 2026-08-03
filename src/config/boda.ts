@@ -55,7 +55,7 @@ export const boda = {
     titulo: 'Etiqueta rigurosa',
     subtitulo: 'Goth black tie',
     intro:
-      'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo y de negro.',
+      'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo y de colores obscuros.',
     nota: 'Cae el 31 de octubre, así que la idea va más por la elegancia oscura que por el disfraz.',
   },
 

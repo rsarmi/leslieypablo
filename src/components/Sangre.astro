@@ -1,0 +1,145 @@
+---
+/**
+ * El puntero sangra: deja regueros que escurren hacia abajo y se desvanecen.
+ *
+ * Cada marca son dos piezas: un hilo que crece hacia abajo desde donde pasó
+ * el cursor y una cabeza abultada al final, que es lo que le da el aspecto de
+ * gota escurriendo en vez de punto redondo.
+ *
+ * Solo en dispositivos con puntero fino (mouse o trackpad). En una pantalla
+ * táctil no hay cursor que seguir, así que el script ni se engancha.
+ */
+---
+
+<div id="sangre" class="pointer-events-none fixed inset-0 z-[9996] overflow-hidden" aria-hidden="true">
+</div>
+
+<script>
+  const capa = document.getElementById('sangre') as HTMLElement;
+
+  const hayPuntero = window.matchMedia('(pointer: fine)').matches;
+  const quiereMovimiento = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (hayPuntero && quiereMovimiento) {
+    /* Cada cuántos píxeles recorridos brota un reguero. Menos = más sangriento. */
+    const CADA_PX = 42;
+    /* Tope de regueros vivos: sin esto, arrastrar el mouse rápido llena el DOM. */
+    const MAX_VIVOS = 30;
+
+    let ultimoX: number | null = null;
+    let ultimoY: number | null = null;
+    let recorrido = 0;
+    let vivos = 0;
+
+    function sangrar(x: number, y: number) {
+      if (vivos >= MAX_VIVOS) return;
+
+      const gota = document.createElement('span');
+      gota.className = 'gota';
+
+      // Todo aleatorio dentro de un rango: si los regueros son iguales entre
+      // sí, el rastro se lee como una guía de puntos y no como sangre.
+      const ancho = 2 + Math.random() * 3.5;
+      gota.style.setProperty('--w', `${ancho}px`);
+      gota.style.setProperty('--largo', `${26 + Math.random() * 120}px`);
+      gota.style.setProperty('--deriva', `${Math.random() * 10 - 5}px`);
+      gota.style.setProperty('--t', `${900 + Math.random() * 1400}ms`);
+      gota.style.left = `${x + (Math.random() * 8 - 4)}px`;
+      gota.style.top = `${y - 2}px`;
+
+      vivos++;
+      gota.addEventListener('animationend', () => {
+        gota.remove();
+        vivos--;
+      });
+
+      capa.appendChild(gota);
+    }
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        // Solo mouse/trackpad: un lápiz o un dedo no deberían sangrar.
+        if (e.pointerType !== 'mouse') return;
+
+        if (ultimoX === null || ultimoY === null) {
+          ultimoX = e.clientX;
+          ultimoY = e.clientY;
+          return;
+        }
+
+        recorrido += Math.hypot(e.clientX - ultimoX, e.clientY - ultimoY);
+        ultimoX = e.clientX;
+        ultimoY = e.clientY;
+
+        if (recorrido < CADA_PX) return;
+        recorrido = 0;
+        sangrar(e.clientX, e.clientY);
+      },
+      { passive: true }
+    );
+  }
+</script>
+
+<style is:global>
+  .gota {
+    position: fixed;
+    width: var(--w);
+    height: 0;
+    will-change: height, opacity, transform;
+    animation: sangrar var(--t) cubic-bezier(0.3, 0, 0.6, 1) forwards;
+  }
+
+  /* El hilo: nace transparente arriba para que no se vea dónde empieza. */
+  .gota::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 0 0 45% 45% / 0 0 8% 8%;
+    background: linear-gradient(
+      to bottom,
+      rgba(163, 18, 15, 0) 0%,
+      rgba(190, 22, 18, 0.75) 22%,
+      #c41813 60%,
+      #8e0f0b 100%
+    );
+  }
+
+  /* La cabeza: va pegada al borde inferior, así que baja conforme el hilo
+     crece. Es lo que hace que se lea como algo que escurre. */
+  .gota::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: calc(var(--w) * 2.1);
+    height: calc(var(--w) * 2.5);
+    transform: translate(-50%, 32%);
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    background: radial-gradient(circle at 34% 26%, #f04a2a 0%, #cf1b16 45%, #7a0d09 100%);
+    box-shadow: 0 0 5px rgba(20, 3, 2, 0.7);
+  }
+
+  @keyframes sangrar {
+    0% {
+      height: 0;
+      opacity: 0;
+      transform: translate(-50%, 0);
+    }
+    12% {
+      opacity: 0.95;
+    }
+    /* Escurre rápido al principio y se frena, como sangre de verdad
+       perdiendo velocidad conforme se adelgaza el hilo. */
+    72% {
+      height: var(--largo);
+      opacity: 0.9;
+      transform: translate(calc(-50% + var(--deriva)), 0);
+    }
+    100% {
+      height: var(--largo);
+      opacity: 0;
+      transform: translate(calc(-50% + var(--deriva)), 0);
+    }
+  }
+</style>

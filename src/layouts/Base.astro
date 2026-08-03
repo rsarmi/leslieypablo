@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { boda } from '../config/boda';
 import { ruta } from '../lib/rutas';
+import Sangre from '../components/Sangre.astro';
 
 interface Props {
   titulo?: string;
@@ -38,6 +39,9 @@ const { titulo = boda.meta.titulo } = Astro.props;
 
     <!-- Grano de película: es lo que más acerca la pantalla al moodboard impreso. -->
     <div class="grano" aria-hidden="true"></div>
+
+    <!-- El puntero sangra al moverse. Solo con mouse. -->
+    <Sangre />
 
     <slot />
 
