@@ -56,7 +56,7 @@ export const boda = {
     subtitulo: 'Goth black tie',
     intro:
       'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo y de colores obscuros.',
-    nota: 'Cae el 31 de octubre, así que la idea va más por la elegancia oscura que por el disfraz.',
+    nota: 'Cae el 31 de octubre, así que la idea va más por la elegancia obscura que por el disfraz.',
   },
 
   rsvp: {
@@ -110,7 +110,7 @@ export const boda = {
     {
       pregunta: '¿Es una fiesta de disfraces?',
       respuesta:
-        'No, es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y oscuro que por disfrazarse. No es una fiesta de disfraces.',
+        'No, es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y obscuro que por disfrazarse. No es una fiesta de disfraces.',
     },
     {
       pregunta: '¿Hasta cuándo puedo confirmar?',
@@ -313,7 +313,7 @@ export const boda = {
       {
         ratio: '2 / 3',
         src: 'moodboard/velos-perlas.jpg',
-        alt: 'Dos mujeres con velos sobre los ojos, perlas y labios oscuros',
+        alt: 'Dos mujeres con velos sobre los ojos, perlas y labios obscuros',
       },
       {
         ratio: '2 / 3',
