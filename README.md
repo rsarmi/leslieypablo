@@ -150,29 +150,61 @@ Lo que sí queda protegido de verdad:
 
 ## Despliegue
 
-Cada push a `main` construye y publica. Configuración única en GitHub:
+**En vivo: https://rsarmi.github.io/leslieypablo/**
 
-**Settings → Pages → Source: GitHub Actions.**
+Cada push a `main` construye y publica. Pages ya está habilitado en modo
+`workflow`; se activó con la API porque el `GITHUB_TOKEN` del propio workflow
+no tiene permiso para crear el sitio:
 
-### Dominio
+```bash
+gh api -X POST repos/rsarmi/leslieypablo/pages -f build_type=workflow
+```
 
-`astro.config.mjs` decide el `base` según exista o no `public/CNAME`:
+Equivale a *Settings → Pages → Source: **GitHub Actions***. Solo hace falta una
+vez; si alguna vez el deploy vuelve a fallar con `Get Pages site failed`, es
+que esa configuración se perdió.
 
-| Situación               | URL                                    | `base`           |
-| ----------------------- | -------------------------------------- | ---------------- |
-| Sin `public/CNAME`      | `rsarmi.github.io/leslieypablo`        | `/leslieypablo`  |
-| Con `public/CNAME`      | el dominio propio                      | `/`              |
+### Dominio propio
 
-Para activar el dominio propio:
+`astro.config.mjs` decide el `base` según exista o no `public/CNAME`, así que
+no hay que acordarse de cambiarlo a mano:
 
-1. Crear `public/CNAME` con una sola línea: el dominio, sin `https://`.
-2. Actualizar `site` en `astro.config.mjs` con ese mismo dominio.
-3. En el DNS del dominio:
-   - Apex (`ejemplo.com`) → cuatro registros `A` a `185.199.108.153`,
-     `185.199.109.153`, `185.199.110.153`, `185.199.111.153`.
-   - Subdominio (`www.ejemplo.com`) → un `CNAME` a `rsarmi.github.io`.
-4. Settings → Pages → Custom domain → escribir el dominio y activar
-   **Enforce HTTPS** cuando GitHub termine de emitir el certificado.
+| Situación          | URL                              | `base`          |
+| ------------------ | -------------------------------- | --------------- |
+| Sin `public/CNAME` | `rsarmi.github.io/leslieypablo`  | `/leslieypablo` |
+| Con `public/CNAME` | el dominio propio                | `/`             |
+
+**El orden importa: primero el DNS, después el `CNAME`.** Si se despliega el
+archivo antes de que el dominio resuelva, GitHub lo marca como no verificado
+y hay que rehacerlo.
+
+1. **DNS del registrador.** Para el dominio pelón (`ejemplo.com`), cuatro
+   registros `A`:
+
+   ```
+   185.199.108.153
+   185.199.109.153
+   185.199.110.153
+   185.199.111.153
+   ```
+
+   Para un subdominio (`www.ejemplo.com`), en cambio, un solo `CNAME` que
+   apunte a `rsarmi.github.io`.
+
+2. Esperar a que propague: `dig +short ejemplo.com` debe devolver esas IPs.
+
+3. **En el repo**: crear `public/CNAME` con una sola línea —el dominio, sin
+   `https://` ni diagonal— y actualizar `site` en `astro.config.mjs`. Push.
+
+   El archivo tiene que vivir en `public/` y no solo en la configuración de
+   GitHub: con el modo `workflow`, cada deploy reemplaza el sitio con lo que
+   traiga `dist/`, así que un CNAME puesto solo desde la interfaz se perdería.
+
+4. **En GitHub**: `gh api -X PUT repos/rsarmi/leslieypablo/pages -f cname=ejemplo.com`
+   (o Settings → Pages → Custom domain).
+
+5. Cuando GitHub termine de emitir el certificado —puede tardar hasta una
+   hora— activar **Enforce HTTPS**.
 
 ---
 
