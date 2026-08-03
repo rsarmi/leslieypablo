@@ -4,10 +4,8 @@
 #
 #   ./scripts/probar-endpoint.sh unlock  'la-contrasena'
 #   ./scripts/probar-endpoint.sh buscar  'la-contrasena' 'elvira miller'
-#   ./scripts/probar-endpoint.sh rsvp    'la-contrasena'
 #
 # `buscar` es de solo lectura: se puede correr las veces que haga falta.
-# `rsvp` escribe una fila de prueba en `Respuestas` que hay que borrar después.
 #
 # `confirmar` no está aquí a propósito: marcaría la fila de un invitado de
 # verdad. Para probarla, usen su propia fila y borren las tres columnas del
@@ -29,7 +27,7 @@ PASSWORD="${2:-}"
 CONSULTA="${3:-}"
 
 if [[ -z "$PASSWORD" ]]; then
-  echo "Uso: $0 [unlock|buscar|rsvp] <contraseña> [consulta]" >&2
+  echo "Uso: $0 [unlock|buscar] <contraseña> [consulta]" >&2
   exit 1
 fi
 
@@ -43,9 +41,6 @@ case "$ACCION" in
       exit 1
     fi
     CUERPO=$(printf '{"action":"buscar","password":"%s","consulta":"%s"}' "$PASSWORD" "$CONSULTA")
-    ;;
-  rsvp)
-    CUERPO=$(printf '{"action":"rsvp","password":"%s","nombre":"PRUEBA — borrar esta fila","contacto":"prueba@ejemplo.com","asiste":"si","acompanantes":1,"nombresAcompanantes":["Acompañante de prueba"],"cancion":"Bela Lugosi'"'"'s Dead","mensaje":"Fila de prueba automatizada."}' "$PASSWORD")
     ;;
   *)
     echo "Acción desconocida: $ACCION" >&2

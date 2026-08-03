@@ -57,11 +57,9 @@ import Ornamento from './Ornamento.astro';
 
       <p id="buscar-mas" class="text-ash mt-4 hidden text-sm italic"></p>
 
-      <div class="border-brass/15 mt-9 border-t pt-7 text-center">
-        <button id="abrir-plan-b" type="button" class="enlace-sobrio">
-          {boda.rsvp.enlacePlanB}
-        </button>
-      </div>
+      {/* El script lo copia al aviso de arriba cuando no encuentra a nadie. */}
+      <template id="texto-sin-resultados">{boda.rsvp.sinResultados}</template>
+
     </div>
 
     {/* ------------------------------------------------ 2. Confirmación */}
@@ -140,97 +138,11 @@ import Ornamento from './Ornamento.astro';
       </button>
     </div>
 
-    {/* ------------------------------------------------ 4. Plan B: formulario abierto */}
-    <div id="paso-abierto" class="hidden">
-      <button id="cerrar-plan-b" type="button" class="enlace-sobrio mb-8">
-        ← Volver a buscar mi nombre
-      </button>
-
-      <p class="text-bone-dim mb-8">{boda.rsvp.introPlanB}</p>
-
-      <form id="rsvp-form" novalidate>
-        <div class="space-y-7">
-          <div>
-            <label class="etiqueta" for="rsvp-nombre">Nombre completo *</label>
-            <input
-              id="rsvp-nombre"
-              name="nombre"
-              type="text"
-              class="campo"
-              autocomplete="name"
-              placeholder="Nombre y apellidos"
-              required
-              maxlength="120"
-            />
-          </div>
-
-          <fieldset>
-            <legend class="etiqueta">¿Nos acompañas? *</legend>
-            <div class="grid gap-3 sm:grid-cols-2">
-              <label class="opcion">
-                <input type="radio" name="asiste" value="si" class="sr-only" required checked />
-                <span class="opcion-caja">Ahí estaré</span>
-              </label>
-              <label class="opcion">
-                <input type="radio" name="asiste" value="no" class="sr-only" />
-                <span class="opcion-caja">No podré ir</span>
-              </label>
-            </div>
-          </fieldset>
-
-          <div>
-            <label class="etiqueta" for="rsvp-mail">Correo *</label>
-            <input
-              id="rsvp-mail"
-              name="mail"
-              type="email"
-              class="campo"
-              autocomplete="email"
-              autocapitalize="off"
-              autocorrect="off"
-              spellcheck="false"
-              placeholder="tu@correo.com"
-              maxlength="120"
-            />
-          </div>
-
-          <div>
-            <label class="etiqueta" for="rsvp-telefono">Teléfono *</label>
-            <input
-              id="rsvp-telefono"
-              name="telefono"
-              type="tel"
-              class="campo"
-              autocomplete="tel"
-              inputmode="tel"
-              placeholder="Con WhatsApp, para avisarte cualquier cambio"
-              maxlength="60"
-            />
-          </div>
-        </div>
-
-        <p
-          id="rsvp-error"
-          class="text-ember mt-6 min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
-          role="alert"
-          aria-live="polite"
-        >
-        </p>
-
-        <button id="rsvp-boton" type="submit" class="btn mt-3 w-full"> Enviar respuesta </button>
-      </form>
-    </div>
   </div>
 </Seccion>
 
 <script>
-  import {
-    buscarInvitado,
-    confirmarInvitado,
-    enviarRsvp,
-    type DatosRsvp,
-    type InvitadoEncontrado,
-  } from '../lib/api';
+  import { buscarInvitado, confirmarInvitado, type InvitadoEncontrado } from '../lib/api';
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -240,7 +152,6 @@ import Ornamento from './Ornamento.astro';
     servidor: 'Algo falló. Inténtenlo en un momento',
     sin_configurar: 'El formulario aún no está conectado',
     campos_requeridos: 'Faltan el correo o el teléfono',
-    falta_nombre: 'Falta tu nombre',
     consulta_corta: 'Escriban al menos tres letras',
     fila_cambio: 'La lista cambió. Búsquense otra vez, por favor',
     mail_invalido: 'Ese correo no se ve bien. Revísenlo',
@@ -251,7 +162,7 @@ import Ornamento from './Ornamento.astro';
   // Navegación entre pantallas
   // -------------------------------------------------------------------------
 
-  const PASOS = ['buscar', 'confirmar', 'exito', 'abierto'] as const;
+  const PASOS = ['buscar', 'confirmar', 'exito'] as const;
   type Paso = (typeof PASOS)[number];
 
   function mostrarPaso(paso: Paso) {
@@ -272,6 +183,9 @@ import Ornamento from './Ornamento.astro';
   const avisoMas = $('buscar-mas');
 
   const MINIMO = 3;
+
+  /** Viene de boda.ts por el <template>, para no duplicar el texto aquí. */
+  const SIN_RESULTADOS = $<HTMLTemplateElement>('texto-sin-resultados').innerHTML.trim();
 
   /**
    * Cada búsqueda lleva número. Si alguien le da a «Buscarme» dos veces
@@ -340,8 +254,7 @@ import Ornamento from './Ornamento.astro';
     if (!resultados.length) {
       limpiarResultados();
       pintarEstado('No encontramos ese nombre');
-      avisoMas.textContent =
-        'Prueben con el apellido, o con menos palabras. Si aun así no aparece, usen el enlace de abajo y los agregamos a mano.';
+      avisoMas.textContent = SIN_RESULTADOS;
       avisoMas.classList.remove('hidden');
       return;
     }
@@ -503,83 +416,6 @@ import Ornamento from './Ornamento.astro';
     entradaBusqueda.focus();
   });
 
-  // -------------------------------------------------------------------------
-  // 4. Plan B: el formulario abierto de siempre
-  // -------------------------------------------------------------------------
-
-  $('abrir-plan-b').addEventListener('click', () => {
-    mostrarPaso('abierto');
-    $('rsvp-nombre').focus();
-  });
-
-  $('cerrar-plan-b').addEventListener('click', () => {
-    mostrarPaso('buscar');
-    entradaBusqueda.focus();
-  });
-
-  const form = $<HTMLFormElement>('rsvp-form');
-  const boton = $<HTMLButtonElement>('rsvp-boton');
-  const error = $('rsvp-error');
-
-  const inputNombre = $<HTMLInputElement>('rsvp-nombre');
-  const inputMail = $<HTMLInputElement>('rsvp-mail');
-  const inputTelefono = $<HTMLInputElement>('rsvp-telefono');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    error.textContent = '';
-
-    const nombre = inputNombre.value.trim();
-    const mail = inputMail.value.trim();
-    const telefono = inputTelefono.value.trim();
-
-    // Las mismas reglas que valida el servidor, para no gastar un viaje.
-    const problemas: [HTMLInputElement, boolean, string][] = [
-      [inputNombre, !nombre, 'falta_nombre'],
-      [inputMail, !mail, 'campos_requeridos'],
-      [inputMail, mail.indexOf('@') < 1 || !mail.includes('.'), 'mail_invalido'],
-      [inputTelefono, !telefono, 'campos_requeridos'],
-      [inputTelefono, telefono.replace(/\D/g, '').length < 8, 'telefono_invalido'],
-    ];
-
-    for (const campo of [inputNombre, inputMail, inputTelefono]) {
-      campo.setAttribute('aria-invalid', 'false');
-    }
-
-    for (const [campo, falla, codigo] of problemas) {
-      if (!falla) continue;
-      campo.setAttribute('aria-invalid', 'true');
-      campo.focus();
-      error.textContent = MENSAJES[codigo];
-      return;
-    }
-
-    const viene =
-      (form.querySelector('input[name="asiste"]:checked') as HTMLInputElement)?.value === 'si';
-
-    const datos: DatosRsvp = { nombre, asiste: viene ? 'si' : 'no', mail, telefono };
-
-    boton.disabled = true;
-    boton.textContent = 'Enviando…';
-
-    const resultado = await enviarRsvp(datos);
-
-    boton.disabled = false;
-    boton.textContent = 'Enviar respuesta';
-
-    if (!resultado.ok) {
-      error.textContent = MENSAJES[resultado.error] ?? MENSAJES.servidor;
-      return;
-    }
-
-    $('exito-texto').textContent = viene
-      ? 'Te esperamos el 31 de octubre.'
-      : 'Gracias por avisarnos. Te vamos a extrañar esa noche.';
-
-    form.reset();
-    mostrarPaso('exito');
-    $('paso-exito').scrollIntoView({ block: 'center', behavior: 'smooth' });
-  });
 </script>
 
 <style>

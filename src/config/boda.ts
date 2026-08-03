@@ -62,10 +62,12 @@ export const boda = {
   rsvp: {
     intro:
       'Busca tu nombre en la lista y dinos si nos acompañas. Es una confirmación por persona, así que cada quien tiene que buscarse.',
-    /** Texto del enlace que abre el formulario abierto (el plan B). */
-    enlacePlanB: 'No me encuentro en la lista',
-    introPlanB:
-      'Escríbenos aquí y nosotros te agregamos a mano. Es una respuesta por persona: si vienen varios, cada quien manda la suya.',
+    /**
+     * Qué se le dice a quien no aparece en la lista. No hay formulario
+     * alternativo a propósito: si alguien falta, lo agregan ustedes a mano.
+     */
+    sinResultados:
+      'Prueba con tu apellido, o con menos palabras. Si aun así no apareces, escríbele a Leslie o a Pablo y lo revisamos.',
   },
 
   regalos: {

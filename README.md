@@ -84,8 +84,8 @@ El código está en **`apps-script/Codigo.gs`**.
 
 1. Google Sheet de la boda → **Extensiones → Apps Script**.
 2. Pegar `apps-script/Codigo.gs` completo.
-3. Ejecutar la función `instalar()` una vez. Crea las pestañas `Config` y
-   `Respuestas` y pide los permisos. Es idempotente.
+3. Ejecutar la función `instalar()` una vez. Crea la pestaña `Config`, agrega
+   las columnas del sitio a `Invitados` y pide los permisos. Es idempotente.
 4. Llenar la pestaña `Config`.
 5. **Implementar → Nueva implementación → Aplicación web**
    - Ejecutar como: **Yo**
@@ -102,9 +102,8 @@ Si no, la URL sigue sirviendo el código viejo. Es el error más común.
 
 | Pestaña      | Para qué                                                                     |
 | ------------ | ---------------------------------------------------------------------------- |
-| `Invitados`  | La lista. El sitio la **lee** para el buscador y escribe **solo** en las tres columnas que agrega al final. |
+| `Invitados`  | La lista. El sitio la **lee** para el buscador y escribe **solo** en las cuatro columnas que agrega al final. |
 | `Config`     | `password` y datos bancarios. Cambiarlos aquí surte efecto al instante.       |
-| `Respuestas` | Una fila por cada envío del formulario abierto (el plan B): `Timestamp`, `Nombre completo`, `¿Asiste?`, `Mail`, `Telefono`. |
 
 ---
 
@@ -121,7 +120,7 @@ es un viaje de un par de segundos a Apps Script.
 **Los resultados no dicen quién ya confirmó.** El servidor ni siquiera manda ese
 dato, porque cualquiera con la contraseña puede buscar cualquier nombre.
 
-### Las tres columnas que escribe el sitio
+### Las columnas que escribe el sitio
 
 Se crean solas la primera vez, al final de `Invitados`, después de todo lo que
 ya haya:
@@ -140,7 +139,7 @@ quién marcaron ustedes.
 
 Las columnas se buscan **por nombre de encabezado**, no por posición: pueden
 insertar, mover o reordenar columnas en `Invitados` sin romper nada. Lo único
-que no hay que hacer es renombrar esos tres encabezados.
+que no hay que hacer es renombrar esos cuatro encabezados.
 
 ### Tolerancia a errores
 
@@ -165,18 +164,17 @@ Para calibrarlo sin desplegar el sitio, corran `probarBuscador()` desde el
 editor de Apps Script: escribe en el log qué encuentra para una batería de
 consultas típicas. El umbral está en la constante `UMBRAL` de `Codigo.gs`.
 
-### Quien no se encuentra
+### Quien no aparece en la lista
 
-Hoy hay filas de la lista con solo un nombre de pila, y esas no son
-distinguibles entre sí. Por eso la pantalla tiene abajo un enlace de
-**«No me encuentro en la lista»** que abre un formulario que pide lo mismo que
-la confirmación normal —nombre, si viene, correo y teléfono— y cae en
-`Respuestas` para reconciliarlo a mano. Tampoco acepta grupos: una respuesta
-por persona, igual que la lista.
+**No hay formulario alternativo, a propósito.** El sitio le dice que les
+escriba y ustedes lo agregan a mano a `Invitados`. En cuanto esté en la hoja
+ya puede buscarse solo: la búsqueda lee la lista en cada consulta, no hace
+falta redesplegar nada.
 
-Las columnas de `Respuestas` también se localizan por encabezado, así que las
-que quedaron de la versión anterior del formulario (`Contacto`, `Acompañantes`,
-`Canción`, `Mensaje`…) se pueden borrar a mano cuando quieran.
+El texto que ve esa persona está en `boda.ts` → `rsvp.sinResultados`.
+
+Nadie puede meterse a la lista por su cuenta: el único camino para entrar es
+que ustedes lo escriban en la hoja.
 
 Cambiar la contraseña en `Config` **no requiere redesplegar el sitio**. Los
 invitados que ya habían entrado tendrán que escribirla de nuevo.
@@ -185,7 +183,7 @@ invitados que ya habían entrado tendrán que escribirla de nuevo.
 
 ```bash
 ./scripts/probar-endpoint.sh unlock 'la-contraseña'
-./scripts/probar-endpoint.sh rsvp   'la-contraseña'   # escribe una fila de prueba, borrarla después
+./scripts/probar-endpoint.sh buscar 'la-contraseña' 'elvira miller'
 ```
 
 `curl -L` a secas **no** funciona contra Apps Script: al seguir el 302 hacia

@@ -6,9 +6,9 @@
  *   2. Extensiones → Apps Script.
  *   3. Pegar este archivo completo (reemplazando lo que haya).
  *   4. Ejecutar la función `instalar()` una sola vez desde el editor.
- *      Crea las pestañas `Config` y `Respuestas`, agrega las columnas nuevas
- *      a `Invitados` y pide los permisos. Es idempotente: se puede correr
- *      las veces que haga falta.
+ *      Crea la pestaña `Config`, agrega las columnas del sitio a `Invitados`
+ *      y pide los permisos. Es idempotente: se puede correr las veces que
+ *      haga falta.
  *   5. Llenar la pestaña `Config` con la contraseña y los datos bancarios.
  *   6. Implementar → Nueva implementación → tipo "Aplicación web".
  *        - Ejecutar como: Yo
@@ -19,13 +19,15 @@
  * de la implementación (Implementar → Administrar implementaciones → editar →
  * Versión: Nueva). Si no, la URL sigue sirviendo el código viejo.
  *
- * Sobre la pestaña `Invitados`: el sitio la LEE para el buscador y solo
- * escribe en las tres columnas que agrega al final (ver COLUMNAS_WEB). Las
- * columnas de trabajo de los novios —incluida `Confirmado`— no se tocan nunca.
+ * Sobre la pestaña `Invitados`: el sitio la LEE para el buscador y solo escribe
+ * en las columnas que agrega al final (ver COLUMNAS_WEB). Las columnas de
+ * trabajo de los novios —incluida `Confirmado`— no se tocan nunca.
+ *
+ * Quien no aparece en la lista no tiene forma de meterse solo: lo agregan los
+ * novios a mano. Por eso aquí no hay ningún formulario abierto.
  */
 
 var HOJA_CONFIG = 'Config';
-var HOJA_RESPUESTAS = 'Respuestas';
 var HOJA_INVITADOS = 'Invitados';
 
 /** Encabezado de la columna de `Invitados` sobre la que corre el buscador. */
@@ -41,14 +43,6 @@ var COLUMNA_NOMBRE = 'Nombre';
  * como columna vacía al final.
  */
 var COLUMNAS_WEB = ['Confirmó web', 'Fecha confirmación', 'Mail', 'Telefono'];
-
-/**
- * El formulario abierto pide exactamente lo mismo que la confirmación normal.
- * También se localizan por encabezado, así que las columnas viejas que hayan
- * quedado de antes (Contacto, Acompañantes, Canción…) se pueden borrar a mano
- * sin romper nada.
- */
-var COLUMNAS_RESPUESTAS = ['Timestamp', 'Nombre completo', '¿Asiste?', 'Mail', 'Telefono'];
 
 var CLAVES_CONFIG = [
   ['password', 'CAMBIAR-ESTA-CONTRASENA'],
@@ -82,14 +76,6 @@ function instalar() {
     config.setColumnWidth(2, 420);
     config.setFrozenRows(1);
   }
-
-  var respuestas = libro.getSheetByName(HOJA_RESPUESTAS);
-  if (!respuestas) {
-    respuestas = libro.insertSheet(HOJA_RESPUESTAS);
-    respuestas.setFrozenRows(1);
-  }
-  asegurarColumnas(respuestas, COLUMNAS_RESPUESTAS);
-  Logger.log('Columnas listas en "%s".', HOJA_RESPUESTAS);
 
   var invitados = libro.getSheetByName(HOJA_INVITADOS);
   if (!invitados) {
@@ -205,8 +191,6 @@ function doPost(e) {
         return responder(buscarInvitados(datos));
       case 'confirmar':
         return responder(confirmarInvitado(datos));
-      case 'rsvp':
-        return responder(guardarRsvp(datos));
       default:
         return responder({ ok: false, error: 'accion_desconocida' });
     }
@@ -515,42 +499,6 @@ function puntuar(tokensConsulta, foneticasConsulta, nombre) {
   }
 
   return resultado;
-}
-
-// ---------------------------------------------------------------------------
-// Formulario abierto (plan B para quien no se encuentra en la lista)
-// ---------------------------------------------------------------------------
-
-function guardarRsvp(datos) {
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_RESPUESTAS);
-  if (!hoja) return { ok: false, error: 'falta_hoja_respuestas' };
-
-  var nombre = texto(datos.nombre, 120);
-  var mail = texto(datos.mail, 120);
-  var telefono = texto(datos.telefono, 60);
-  var asiste = datos.asiste === 'si' ? 'Sí' : 'No';
-
-  var problema = validarContacto(nombre, mail, telefono);
-  if (problema) return { ok: false, error: problema };
-
-  // El bloqueo evita que dos personas que envían al mismo tiempo pisen la misma fila.
-  var candado = LockService.getScriptLock();
-  candado.waitLock(20000);
-  try {
-    var col = asegurarColumnas(hoja, COLUMNAS_RESPUESTAS);
-    var fila = hoja.getLastRow() + 1;
-
-    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[0]]).setValue(new Date());
-    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[1]]).setValue(nombre);
-    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[2]]).setValue(asiste);
-    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[3]]).setValue(mail);
-    // Como texto: si no, Sheets se come el + del código de país y los ceros.
-    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[4]]).setValue(telefono).setNumberFormat('@');
-  } finally {
-    candado.releaseLock();
-  }
-
-  return { ok: true };
 }
 
 /**

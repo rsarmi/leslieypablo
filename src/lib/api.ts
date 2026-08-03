@@ -69,17 +69,6 @@ export interface DatosConfirmacion {
   telefono: string;
 }
 
-/**
- * Envío del formulario abierto. Pide exactamente lo mismo que la confirmación
- * normal: una persona por respuesta, sin grupos.
- */
-export interface DatosRsvp {
-  nombre: string;
-  asiste: 'si' | 'no';
-  mail: string;
-  telefono: string;
-}
-
 // ---------------------------------------------------------------------------
 // Contraseña recordada
 // ---------------------------------------------------------------------------
@@ -221,26 +210,6 @@ const CODIGOS: ReadonlySet<string> = new Set([
 
 function codigoConocido(error: unknown): ErrorApi {
   return typeof error === 'string' && CODIGOS.has(error) ? (error as ErrorApi) : 'servidor';
-}
-
-export async function enviarRsvp(datos: DatosRsvp): Promise<ResultadoRsvp> {
-  const password = leerPassword();
-  if (!password) return { ok: false, error: 'password' };
-
-  try {
-    const respuesta = await postear({ action: 'rsvp', password, ...datos });
-
-    if (respuesta?.ok) return { ok: true };
-
-    const error = respuesta?.error;
-    if (error === 'password' || error === 'campos_requeridos') {
-      return { ok: false, error };
-    }
-    return { ok: false, error: 'servidor' };
-  } catch (err) {
-    if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
-    return { ok: false, error: 'red' };
-  }
 }
 
 // ---------------------------------------------------------------------------
