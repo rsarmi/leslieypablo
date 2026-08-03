@@ -1,6 +1,5 @@
 ---
 import { boda } from '../config/boda';
-import Ornamento from './Ornamento.astro';
 
 /**
  * Puerta de contraseña.
@@ -31,14 +30,11 @@ import Ornamento from './Ornamento.astro';
   </div>
 
   <div class="relative w-full max-w-sm text-center">
-    <div class="mb-9 flex justify-center">
-      <Ornamento tipo="corazon" class="text-acid h-20 w-20 gate-vela" />
-    </div>
-
     <p class="eyebrow mb-4">Solo por invitación</p>
 
-    <h1 id="gate-titulo" class="text-bone mb-3 text-[clamp(2.5rem,10vw,3.5rem)]">
-      {boda.novios.ella} & {boda.novios.el}
+    {/* Mismo lockup que la portada: es el mismo nombre, tiene que verse igual. */}
+    <h1 id="gate-titulo" class="lockup text-bone mb-3 text-[clamp(2rem,9vw,3rem)]">
+      {boda.novios.ella} <span class="text-acid">&</span> {boda.novios.el}
     </h1>
 
     <p class="text-bone-dim mb-9 font-mono text-[0.6875rem] tracking-[0.3em] uppercase">
@@ -190,27 +186,3 @@ import Ornamento from './Ornamento.astro';
   }
 </script>
 
-<style>
-  /* Parpadeo de vela sobre el corazón del gate. */
-  @media (prefers-reduced-motion: no-preference) {
-    .gate-vela {
-      animation: vela 4.5s ease-in-out infinite;
-    }
-
-    @keyframes vela {
-      0%,
-      100% {
-        opacity: 0.85;
-        filter: drop-shadow(0 0 18px rgba(142, 17, 22, 0.55));
-      }
-      42% {
-        opacity: 1;
-        filter: drop-shadow(0 0 34px rgba(194, 50, 58, 0.7));
-      }
-      58% {
-        opacity: 0.78;
-        filter: drop-shadow(0 0 12px rgba(142, 17, 22, 0.4));
-      }
-    }
-  }
-</style>

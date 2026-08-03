@@ -1,54 +1,37 @@
 ---
 import { boda } from '../config/boda';
 import Seccion from './Seccion.astro';
-import ArcoGotico from './ArcoGotico.astro';
-import Ornamento from './Ornamento.astro';
 ---
 
-<Seccion id="la-boda" eyebrow="El plan" titulo="La boda" ancho="ancho">
-  {/* Fecha, hora y lugar en tres columnas, con el arco de la catedral al lado. */}
-  <div class="grid items-center gap-14 lg:grid-cols-[1fr_auto] lg:gap-20">
-    <div class="revelar space-y-10">
-      <div>
-        <p class="eyebrow mb-3">Cuándo</p>
-        <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.fecha.displayLargo}</p>
-        <p class="text-bone-dim mt-3 font-mono text-xs tracking-[0.22em] uppercase">
-          {boda.fecha.horaInicio} — {boda.fecha.horaFin}
-        </p>
-      </div>
-
-      <div class="filete" aria-hidden="true"></div>
-
-      <div>
-        <p class="eyebrow mb-3">Dónde</p>
-        <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.venue.nombre}</p>
-        <address class="text-bone-dim mt-3 text-lg not-italic">
-          {boda.venue.calle}<br />
-          {boda.venue.colonia} · {boda.venue.ciudad}
-        </address>
-
-        <p class="text-ash mt-5 max-w-md text-base italic">
-          «{boda.venue.epigrafe}»
-        </p>
-
-        <a href={boda.venue.mapsUrl} target="_blank" rel="noopener noreferrer" class="btn btn-ghost mt-7">
-          Abrir en Google Maps
-        </a>
-      </div>
+<Seccion id="la-boda" eyebrow="El plan" titulo="La boda" ancho="normal">
+  {/* Cuándo y dónde, en una sola columna centrada. */}
+  <div class="revelar space-y-10 text-center">
+    <div>
+      <p class="eyebrow mb-3">Cuándo</p>
+      <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.fecha.displayLargo}</p>
+      <p class="text-bone-dim mt-3 font-mono text-xs tracking-[0.22em] uppercase">
+        {boda.fecha.horaInicio} — {boda.fecha.horaFin}
+      </p>
     </div>
 
-    <div class="revelar mx-auto w-full max-w-xs lg:max-w-sm">
-      <ArcoGotico ratio="3 / 4.4">
-        <div class="relative flex h-full w-full items-center justify-center">
-          <div
-            class="absolute inset-0"
-            style="background: linear-gradient(180deg, rgba(74,10,13,0.5), rgba(11,7,8,0.9))"
-          >
-          </div>
-          {/* PLACEHOLDER: imagen del salón o de la pareja, object-cover sobre este bloque. */}
-          <Ornamento tipo="corazon" class="text-blood/45 relative h-28 w-28" />
-        </div>
-      </ArcoGotico>
+    <div class="filete" aria-hidden="true"></div>
+
+    <div>
+      <p class="eyebrow mb-3">Dónde</p>
+      <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.venue.nombre}</p>
+      <address class="text-bone-dim mt-3 text-lg not-italic">
+        {boda.venue.calle}<br />
+        {boda.venue.colonia} · {boda.venue.ciudad}
+      </address>
+
+      <a
+        href={boda.venue.mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-ghost mt-7"
+      >
+        Abrir en Google Maps
+      </a>
     </div>
   </div>
 

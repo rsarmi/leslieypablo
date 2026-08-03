@@ -9,6 +9,7 @@
 @import '@fontsource/cormorant-garamond/latin-400.css';
 @import '@fontsource/cormorant-garamond/latin-400-italic.css';
 @import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/cormorant-garamond/latin-600-italic.css';
 @import '@fontsource/courier-prime/latin-400.css';
 @import '@fontsource/courier-prime/latin-700.css';
 
@@ -40,6 +41,13 @@
   --font-mono: 'Courier Prime', 'Courier New', monospace;
   /* Solo para la marca de la fecha: es el lockup del save-the-date. */
   --font-gotica: 'Pirata One', 'Times New Roman', serif;
+  /*
+   * Lockup "leslie & pablo": Cormorant en cursiva y semibold. Misma familia
+   * que el cuerpo pero a otro peso y en cursiva, así que amarra el sitio en
+   * vez de meter una voz más. Sus serifas puntiagudas son lo que la acerca al
+   * «CASINO» de la referencia sin caer en una display pesada.
+   */
+  --font-lockup: 'Cormorant Garamond', Georgia, serif;
 
   --ease-vela: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -133,6 +141,23 @@
     font-weight: 500;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.02em;
+  }
+
+  /*
+   * --- Lockup de los nombres ---
+   * Rompe a propósito la regla de versalitas de h1/h2/h3: aquí la caja normal
+   * es lo que hace que se lea como "Poison & Pearls". Sin tracking extra,
+   * porque una serif de alto contraste en caja baja ya respira sola.
+   */
+  .lockup {
+    font-family: var(--font-lockup);
+    font-weight: 600;
+    font-style: italic;
+    /* lowercase, no `none`: fuerza minúsculas aunque el config traiga
+       "Leslie" y "Pablo" capitalizados. */
+    text-transform: lowercase;
+    letter-spacing: -0.005em;
+    line-height: 1;
   }
 
   /* --- Marca de la fecha: el lockup blackletter del save-the-date --- */
@@ -299,29 +324,6 @@
   .revelar.visible {
     opacity: 1;
     transform: none;
-  }
-
-  /* --- Arco ojival: el marco de la catedral del moodboard --- */
-  .arco {
-    border-top-left-radius: 50% 22%;
-    border-top-right-radius: 50% 22%;
-    /* El vértice apuntado se logra con el clip encima del radio. */
-    clip-path: polygon(
-      0% 100%,
-      0% 30%,
-      8% 16%,
-      22% 6%,
-      50% 0%,
-      78% 6%,
-      92% 16%,
-      100% 30%,
-      100% 100%
-    );
-  }
-
-  .arco-suave {
-    border-top-left-radius: 50% 30%;
-    border-top-right-radius: 50% 30%;
   }
 
   /* --- Regla horizontal que se desvanece en los extremos --- */

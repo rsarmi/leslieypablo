@@ -49,8 +49,6 @@ export const boda = {
     /** Iframe embebido del mapa. */
     mapsEmbedUrl:
       'https://www.google.com/maps?q=Sal%C3%B3n%20Los%20%C3%81ngeles%2C%20Lerdo%20206%2C%20Guerrero%2C%20CDMX&output=embed',
-    /** Frase histórica del salón; se usa como epígrafe. */
-    epigrafe: 'Quien no conoce Los Ángeles, no conoce México.',
   },
 
   /** Bloques cortos que aparecen en la sección "La boda". */
@@ -181,28 +179,28 @@ export const boda = {
      *
      * Para poner una imagen: guardarla en `public/moodboard/` y llenar `src`
      * (ruta desde la raíz del sitio) y `alt`. El hueco se convierte solo en
-     * imagen con lightbox. `ratio` define la altura dentro del mosaico y
-     * `arco` recorta la imagen con la silueta de arco ojival.
+     * imagen con lightbox, SIN recortarse: conserva su proporción real.
+     * `ratio` solo da altura al hueco mientras no haya imagen.
      */
     items: [
-      { ratio: '2 / 3', arco: true, src: '', alt: '' },
-      { ratio: '1 / 1', arco: false, src: '', alt: '' },
-      { ratio: '3 / 4', arco: false, src: '', alt: '' },
-      { ratio: '4 / 3', arco: false, src: '', alt: '' },
-      { ratio: '2 / 3', arco: false, src: '', alt: '' },
-      { ratio: '1 / 1', arco: true, src: '', alt: '' },
-      { ratio: '3 / 4', arco: false, src: '', alt: '' },
-      { ratio: '3 / 2', arco: false, src: '', alt: '' },
-      { ratio: '2 / 3', arco: false, src: '', alt: '' },
-      { ratio: '4 / 5', arco: false, src: '', alt: '' },
-      { ratio: '1 / 1', arco: false, src: '', alt: '' },
-      { ratio: '2 / 3', arco: true, src: '', alt: '' },
-      { ratio: '4 / 3', arco: false, src: '', alt: '' },
-      { ratio: '3 / 4', arco: false, src: '', alt: '' },
-      { ratio: '2 / 3', arco: false, src: '', alt: '' },
-      { ratio: '1 / 1', arco: false, src: '', alt: '' },
-      { ratio: '3 / 2', arco: false, src: '', alt: '' },
-      { ratio: '3 / 4', arco: true, src: '', alt: '' },
+      { ratio: '2 / 3', src: '', alt: '' },
+      { ratio: '1 / 1', src: '', alt: '' },
+      { ratio: '3 / 4', src: '', alt: '' },
+      { ratio: '4 / 3', src: '', alt: '' },
+      { ratio: '2 / 3', src: '', alt: '' },
+      { ratio: '1 / 1', src: '', alt: '' },
+      { ratio: '3 / 4', src: '', alt: '' },
+      { ratio: '3 / 2', src: '', alt: '' },
+      { ratio: '2 / 3', src: '', alt: '' },
+      { ratio: '4 / 5', src: '', alt: '' },
+      { ratio: '1 / 1', src: '', alt: '' },
+      { ratio: '2 / 3', src: '', alt: '' },
+      { ratio: '4 / 3', src: '', alt: '' },
+      { ratio: '3 / 4', src: '', alt: '' },
+      { ratio: '2 / 3', src: '', alt: '' },
+      { ratio: '1 / 1', src: '', alt: '' },
+      { ratio: '3 / 2', src: '', alt: '' },
+      { ratio: '3 / 4', src: '', alt: '' },
     ],
   },
 

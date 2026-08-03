@@ -8,7 +8,8 @@ const { items } = boda.moodboard;
 
 /**
  * Mosaico irregular con `columns` de CSS: masonry real sin JavaScript ni
- * librería. Las alturas dispares salen del `aspect-ratio` de cada pieza.
+ * librería. Las alturas dispares las da la proporción natural de cada
+ * imagen, que no se recorta.
  */
 ---
 
@@ -22,50 +23,51 @@ const { items } = boda.moodboard;
   <div class="columns-2 gap-3 sm:columns-3 sm:gap-4 lg:columns-4">
     {
       items.map((item, i) => {
-        const forma = item.arco ? 'arco' : '';
         const vacio = !item.src;
-        const src = vacio ? '' : ruta(item.src);
+
+        /*
+         * Las imágenes NO se recortan: van sin aspect-ratio impuesto y con
+         * altura automática, así que cada una conserva su proporción real y
+         * el mosaico se acomoda alrededor. El `ratio` del config solo sirve
+         * para darle altura al hueco mientras no hay imagen.
+         */
+        if (vacio) {
+          return (
+            <figure class="revelar mb-3 break-inside-avoid sm:mb-4">
+              <div
+                class="bg-ink-2 border-brass/20 relative flex items-center justify-center gap-2.5 border"
+                style={`aspect-ratio:${item.ratio}`}
+              >
+                <div
+                  class="absolute inset-0"
+                  style="background:linear-gradient(150deg, rgba(87,19,16,0.4), rgba(21,5,3,0.5))"
+                />
+                <Ornamento tipo="rombo" class="text-brass/50 relative h-4 w-4" />
+                <span class="text-ash relative font-mono text-[0.5625rem] tracking-[0.2em] uppercase">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+            </figure>
+          );
+        }
 
         return (
           <figure class="revelar mb-3 break-inside-avoid sm:mb-4">
-            <div
-              class={`bg-ink-2 border-brass/20 relative overflow-hidden border ${forma}`}
-              style={`aspect-ratio:${item.ratio}`}
+            <button
+              type="button"
+              class="group border-brass/20 block w-full cursor-zoom-in border"
+              data-lightbox={ruta(item.src)}
+              data-alt={item.alt}
+              aria-label={`Ampliar: ${item.alt}`}
             >
-              {vacio ? (
-                /* Hueco a la espera de imagen. Mantiene el ritmo del mosaico. */
-                <div class="absolute inset-0 flex flex-col items-center justify-center gap-2.5">
-                  <div
-                    class="absolute inset-0"
-                    style="background:linear-gradient(150deg, rgba(74,10,13,0.32), rgba(11,7,8,0.55))"
-                  />
-                  <Ornamento tipo="rombo" class="text-brass/50 relative h-4 w-4" />
-                  <span class="text-ash relative font-mono text-[0.5625rem] tracking-[0.2em] uppercase">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  class="group absolute inset-0 block h-full w-full cursor-zoom-in"
-                  data-lightbox={src}
-                  data-alt={item.alt}
-                  aria-label={`Ampliar: ${item.alt}`}
-                >
-                  <img
-                    src={src}
-                    alt={item.alt}
-                    loading="lazy"
-                    decoding="async"
-                    class="h-full w-full object-cover transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
-                  />
-                  <span
-                    class="bg-ink/30 absolute inset-0 transition-opacity duration-500 group-hover:opacity-0"
-                    aria-hidden="true"
-                  />
-                </button>
-              )}
-            </div>
+              <img
+                src={ruta(item.src)}
+                alt={item.alt}
+                loading="lazy"
+                decoding="async"
+                class="filmico block h-auto w-full transition-opacity duration-500 group-hover:opacity-85"
+              />
+            </button>
           </figure>
         );
       })

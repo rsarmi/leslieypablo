@@ -8,11 +8,9 @@ import { ruta } from '../lib/rutas';
   class="vineta relative flex min-h-[100svh] flex-col items-center justify-center gap-8 py-12 sm:gap-16 sm:py-16"
 >
   {/*
-    Banda de tres fotos a todo lo ancho, sin recortes raros: rectángulos
-    horizontales del mismo alto separados por un filo de latón. Las fotos ya
-    vienen en la paleta (luz roja, grano de película), así que no llevan filtro.
-  */}
-  {/*
+    Banda de tres fotos a todo lo ancho: rectángulos horizontales del mismo
+    alto separados por un filo de latón, con el tratamiento fílmico encima.
+
     order-2 en móvil: apiladas ocupan más de una pantalla, así que si van
     primero lo único que se ve al abrir son las fotos y los nombres quedan
     bajo el pliegue. De 640px para arriba caben en fila y vuelven arriba.
@@ -36,7 +34,7 @@ import { ruta } from '../lib/rutas';
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchpriority={i === 0 ? 'high' : 'auto'}
             decoding="async"
-            class="h-full w-full object-cover"
+            class="filmico h-full w-full object-cover"
           />
         </figure>
       ))
@@ -44,12 +42,10 @@ import { ruta } from '../lib/rutas';
   </div>
 
   <div class="relative order-1 w-full max-w-3xl px-5 text-center sm:order-2">
-    <h1 class="revelar text-bone text-[clamp(1.25rem,5.5vw,3rem)]">
+    <h1 class="revelar lockup text-bone text-[clamp(1.75rem,7vw,3.75rem)]">
       <span class="block">{boda.novios.ella}</span>
-      <span
-        class="text-acid my-0.5 block text-[0.5em] normal-case italic sm:my-1"
-        style="letter-spacing:0">&</span
-      >
+      {/* El ampersand cursivo de Cormorant es el más ornamentado de la familia. */}
+      <span class="text-acid my-1 block text-[0.62em]">&</span>
       <span class="block">{boda.novios.el}</span>
     </h1>
 
