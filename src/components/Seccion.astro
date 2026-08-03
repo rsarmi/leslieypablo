@@ -24,10 +24,15 @@ const {
   class: clase = '',
 } = Astro.props;
 
+/*
+ * Semitransparentes a propósito: el degradado de ojo de gato vive en una capa
+ * fija detrás de todo (.ojo) y tiene que verse a través de las secciones. Un
+ * fondo opaco aquí lo taparía y el sitio volvería a sentirse plano.
+ */
 const fondos = {
-  oscuro: 'bg-ink',
-  elevado: 'bg-ink-2',
-  sangre: 'bg-oxblood/25',
+  oscuro: '',
+  elevado: 'bg-ink-2/45',
+  sangre: 'bg-oxblood/35',
 } as const;
 
 const anchos = {
@@ -45,12 +50,12 @@ const anchos = {
     <header class="revelar mb-14 text-center sm:mb-20">
       {eyebrow && <p class="eyebrow mb-5">{eyebrow}</p>}
 
-      <h2 class="text-bone text-[clamp(2.25rem,7vw,4rem)]">{titulo}</h2>
+      <h2 class="text-bone text-[clamp(1.75rem,5.5vw,3.25rem)]">{titulo}</h2>
 
       {/* Divisor: filete — rombo — filete */}
       <div class="mt-7 flex items-center justify-center gap-4" aria-hidden="true">
         <span class="filete w-16 sm:w-24"></span>
-        <Ornamento tipo="rombo" class="text-brass h-3.5 w-3.5 shrink-0" />
+        <Ornamento tipo="rombo" class="text-acid h-3.5 w-3.5 shrink-0" />
         <span class="filete w-16 sm:w-24"></span>
       </div>
 

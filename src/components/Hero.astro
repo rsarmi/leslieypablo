@@ -1,55 +1,59 @@
 ---
 import { boda } from '../config/boda';
-import Ornamento from './Ornamento.astro';
+import { ruta } from '../lib/rutas';
 ---
 
-<section id="inicio" class="vineta relative flex min-h-[100svh] items-center justify-center px-5 py-20">
+<section
+  id="inicio"
+  class="vineta relative flex min-h-[100svh] flex-col items-center justify-center gap-12 py-16 sm:gap-16"
+>
   {/*
-    Hueco para la imagen de portada. Cuando la tengan, se sustituye este div por
-    una <img> con las mismas clases y se sube la opacidad a ~0.35.
+    Banda de tres fotos a todo lo ancho, sin recortes raros: rectángulos
+    horizontales del mismo alto separados por un filo de latón. Las fotos ya
+    vienen en la paleta (luz roja, grano de película), así que no llevan filtro.
   */}
-  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
-    <div
-      class="absolute inset-0"
-      style="background: radial-gradient(ellipse 80% 60% at 50% 38%, rgba(74,10,13,0.55), transparent 72%), radial-gradient(ellipse 50% 40% at 50% 100%, rgba(142,17,22,0.2), transparent 70%)"
-    >
-    </div>
-    {/* PLACEHOLDER PORTADA: reemplazar por <img src="/moodboard/portada.jpg" class="h-full w-full object-cover opacity-35" /> */}
+  <div class="bg-brass/30 revelar relative grid w-full grid-cols-3 gap-px">
+    {
+      boda.portada.map((foto, i) => (
+        <figure class="bg-ink-2 relative overflow-hidden" style="aspect-ratio:3 / 2">
+          <img
+            src={ruta(foto.src)}
+            alt={foto.alt}
+            width="1300"
+            height="867"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : 'auto'}
+            decoding="async"
+            class="h-full w-full object-cover"
+          />
+        </figure>
+      ))
+    }
   </div>
 
-  <div class="relative w-full max-w-3xl text-center">
-    <div class="revelar mb-6 flex justify-center sm:mb-8">
-      <Ornamento tipo="murcielago" class="text-brass/70 h-11 w-auto sm:h-14" />
-    </div>
-
-    <p class="revelar eyebrow mb-5">Nos casamos</p>
-
-    <h1 class="revelar text-bone text-[clamp(3.25rem,15vw,8rem)] leading-[0.95]">
+  <div class="relative w-full max-w-3xl px-5 text-center">
+    <h1 class="revelar text-bone text-[clamp(2.5rem,11vw,6rem)]">
       <span class="block">{boda.novios.ella}</span>
-      <span class="text-blood my-1 block text-[0.42em] italic sm:my-2" style="font-family:var(--font-serif)">
-        &
-      </span>
+      <span
+        class="text-acid my-0.5 block text-[0.5em] normal-case italic sm:my-1"
+        style="letter-spacing:0">&</span
+      >
       <span class="block">{boda.novios.el}</span>
     </h1>
 
-    <div class="revelar mt-8 flex items-center justify-center gap-5" aria-hidden="true">
-      <span class="filete w-14 sm:w-24"></span>
-      <Ornamento tipo="daga" class="text-brass h-9 w-auto shrink-0" />
-      <span class="filete w-14 sm:w-24"></span>
-    </div>
-
-    <p class="revelar text-bone mt-7 font-mono text-xs tracking-[0.32em] uppercase sm:text-sm sm:tracking-[0.42em]">
-      {boda.fecha.displayCorto}
+    {/* La marca del save-the-date, tal cual: blackletter en verde ácido. */}
+    <p class="revelar fecha-marca mt-6 text-[clamp(3rem,14vw,7rem)]">
+      {boda.fecha.marca}
     </p>
 
-    <p class="revelar text-bone-dim mt-3 text-lg italic sm:text-xl">
+    <p class="revelar text-bone-dim mt-4 text-lg italic sm:text-xl">
       {boda.venue.nombre} · Ciudad de México
     </p>
 
     {/* Cuenta regresiva: se llena en el cliente para no servir HTML rancio. */}
     <div
       id="cuenta"
-      class="revelar text-bone-dim mt-9 flex justify-center gap-6 font-mono sm:gap-10"
+      class="revelar text-bone-dim mt-8 flex justify-center gap-6 sm:gap-10"
       aria-live="off"
     >
       {
@@ -60,14 +64,10 @@ import Ornamento from './Ornamento.astro';
           ['segundos', 'Seg'],
         ].map(([id, etiqueta]) => (
           <div class="text-center">
-            <span
-              id={`cuenta-${id}`}
-              class="text-bone block text-2xl tabular-nums sm:text-3xl"
-              style="font-family:var(--font-display)"
-            >
+            <span id={`cuenta-${id}`} class="cifras text-bone block text-2xl sm:text-3xl">
               —
             </span>
-            <span class="text-brass mt-1.5 block text-[0.5625rem] tracking-[0.22em] uppercase">
+            <span class="text-brass mt-1.5 block font-mono text-[0.5625rem] tracking-[0.22em] uppercase">
               {etiqueta}
             </span>
           </div>
@@ -75,7 +75,7 @@ import Ornamento from './Ornamento.astro';
       }
     </div>
 
-    <a href="#rsvp" class="revelar btn mt-10 inline-flex"> Confirmar asistencia </a>
+    <a href="#rsvp" class="revelar btn mt-9 inline-flex"> Confirmar asistencia </a>
   </div>
 
   {/* En pantallas bajas el hero ya no cabe y este enlace se encimaría con el botón. */}
@@ -86,14 +86,6 @@ import Ornamento from './Ornamento.astro';
     Bajar
   </a>
 </section>
-
-<style>
-  @media (max-height: 780px) {
-    .bajar {
-      display: none;
-    }
-  }
-</style>
 
 <script>
   import { boda } from '../config/boda';
@@ -138,3 +130,11 @@ import Ornamento from './Ornamento.astro';
     }, 1000);
   }
 </script>
+
+<style>
+  @media (max-height: 800px) {
+    .bajar {
+      display: none;
+    }
+  }
+</style>

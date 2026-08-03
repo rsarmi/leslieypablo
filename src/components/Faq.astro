@@ -11,7 +11,9 @@ import Seccion from './Seccion.astro';
           <summary
             class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left"
           >
-            <span class="text-bone group-hover:text-ember font-display text-xl transition-colors sm:text-2xl">
+            {/* Serif y en caja normal: ocho preguntas en versalitas Didone se
+                vuelven ilegibles de corrido. El display se reserva al título. */}
+            <span class="text-bone group-hover:text-ember font-serif text-xl transition-colors sm:text-2xl">
               {item.pregunta}
             </span>
 

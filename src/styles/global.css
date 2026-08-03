@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 
 /* Tipografías self-hosted: nada sale hacia el CDN de Google. */
-@import '@fontsource/grenze-gotisch/latin-400.css';
-@import '@fontsource/grenze-gotisch/latin-500.css';
-@import '@fontsource/grenze-gotisch/latin-700.css';
+@import '@fontsource/bodoni-moda/latin-400.css';
+@import '@fontsource/bodoni-moda/latin-400-italic.css';
+@import '@fontsource/bodoni-moda/latin-500.css';
+@import '@fontsource/pirata-one/latin-400.css';
 @import '@fontsource/cormorant-garamond/latin-300.css';
 @import '@fontsource/cormorant-garamond/latin-400.css';
 @import '@fontsource/cormorant-garamond/latin-400-italic.css';
@@ -12,20 +13,33 @@
 @import '@fontsource/courier-prime/latin-700.css';
 
 @theme {
-  /* Paleta: sacada directamente del moodboard. */
-  --color-ink: #0b0708; /* negro cálido, fondo base */
-  --color-ink-2: #140d0e; /* superficie elevada */
-  --color-oxblood: #4a0a0d; /* vino profundo, bloques */
-  --color-blood: #8e1116; /* rojo del moodboard, acentos */
-  --color-ember: #c2323a; /* hover, énfasis */
-  --color-bone: #e8e0d2; /* texto principal, pergamino */
-  --color-bone-dim: #b9b0a1; /* texto secundario sobre oscuro */
-  --color-brass: #b08d4f; /* filos dorados, ornamentos */
-  --color-ash: #6f6660; /* bordes, texto terciario */
+  /*
+   * Paleta muestreada del save-the-date. El fondo es sangre cálida (la luz
+   * roja de las fotos), y el acento es un VERDE ÁCIDO que en el video se usa
+   * solo para la fecha. Ese contraste rojo/verde ácido es la identidad; hay
+   * que dosificar el verde o deja de funcionar.
+   */
+  --color-ink: #2a0907; /* sangre profunda y cálida, fondo base */
+  --color-ink-2: #3a0f0b; /* superficie elevada */
+  --color-oxblood: #571310; /* vino, bloques destacados */
+  --color-blood: #a32a12; /* rojo del video */
+  --color-ember: #c44117; /* naranja de la luz, hover */
+  --color-acid: #cdfc59; /* VERDE ÁCIDO del save-the-date */
+  --color-bone: #ece4d6; /* texto principal, pergamino */
+  --color-bone-dim: #c6b8a7; /* texto secundario */
+  --color-brass: #c39a54; /* bronce: filos y estructura */
+  --color-ash: #8d7268; /* bordes, texto terciario */
 
-  --font-display: 'Grenze Gotisch', 'Times New Roman', serif;
+  /*
+   * Didone de alto contraste en versalitas: la voz de las referencias
+   * ("LOVERS to ENEMIES", "YOU'RE INVITED"). Hairlines finas, serifas
+   * afiladas. Se usa siempre en mayúsculas y con tracking abierto.
+   */
+  --font-display: 'Bodoni Moda', 'Didot', 'Times New Roman', serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'Courier Prime', 'Courier New', monospace;
+  /* Solo para la marca de la fecha: es el lockup del save-the-date. */
+  --font-gotica: 'Pirata One', 'Times New Roman', serif;
 
   --ease-vela: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -39,12 +53,15 @@
     scroll-behavior: smooth;
     /* El nav sticky no debe tapar el título de la sección al saltar a un ancla. */
     scroll-padding-top: 5.5rem;
-    background-color: var(--color-ink);
+    /* El color más hundido de la paleta: es lo que se ve en las esquinas. */
+    background-color: #150503;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background-color: var(--color-ink);
+    /* Transparente a propósito: el degradado de ojo de gato va en .ojo, que
+       se pinta detrás (z-index -1) y necesita que el body lo deje pasar. */
+    background-color: transparent;
     color: var(--color-bone);
     font-family: var(--font-serif);
     font-size: 1.125rem;
@@ -53,13 +70,26 @@
     overflow-x: hidden;
   }
 
+  /*
+   * Todos los títulos van en versalitas con tracking abierto. Una Didone en
+   * caja alta necesita más interlínea y más letter-spacing que una serif
+   * normal; sin eso las hairlines se apelmazan.
+   */
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
     font-weight: 400;
-    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.15;
     text-wrap: balance;
+  }
+
+  /* A mayor tamaño, menos tracking: si no, las palabras se desarman. */
+  h1 {
+    letter-spacing: 0.045em;
+    line-height: 1.06;
   }
 
   p {
@@ -73,7 +103,7 @@
 
   /* Foco visible y temático: nunca quitarlo, solo vestirlo. */
   :focus-visible {
-    outline: 2px solid var(--color-brass);
+    outline: 2px solid var(--color-acid);
     outline-offset: 3px;
   }
 
@@ -88,13 +118,38 @@
 }
 
 @layer components {
+  /* --- Display fuera de un heading: cifras, monogramas, destacados --- */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Cifras de la cuenta regresiva: sin versalitas (no aplican) y sin tracking
+     extra, que en números tabulares abre huecos feos. */
+  .cifras {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* --- Marca de la fecha: el lockup blackletter del save-the-date --- */
+  .fecha-marca {
+    font-family: var(--font-gotica);
+    color: var(--color-acid);
+    line-height: 0.95;
+    letter-spacing: 0.02em;
+  }
+
   /* --- Etiquetas mecanografiadas: el "DATE: OCTOBER 30TH" del moodboard --- */
   .eyebrow {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.34em;
     text-transform: uppercase;
-    color: var(--color-brass);
+    color: var(--color-acid);
   }
 
   /* --- Botón principal --- */
@@ -198,6 +253,39 @@
 }
 
 @layer utilities {
+  /*
+   * --- Ojo de gato ---
+   * Capa fija bajo todo el contenido. Tres degradados apilados:
+   *   1. la pupila: una rendija vertical, lo más encendido del rojo
+   *   2. el iris: una elipse ancha y baja, la forma del ojo
+   *   3. la viñeta: hunde las esquinas hasta casi negro
+   * Fija (no scrollea) para que el sitio entero se sienta iluminado desde
+   * un mismo punto, como el moodboard.
+   */
+  .ojo {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      /* La pupila va muy tenue: si se marca, se lee como una franja de luz
+         mal puesta en vez de como el brillo del centro del ojo. */
+      radial-gradient(
+        ellipse 26% 44% at 50% 38%,
+        rgba(224, 112, 52, 0.22) 0%,
+        rgba(196, 65, 23, 0.1) 45%,
+        transparent 76%
+      ),
+      radial-gradient(
+        ellipse 130% 48% at 50% 40%,
+        #8a2411 0%,
+        #5e150e 30%,
+        #380d09 58%,
+        transparent 80%
+      ),
+      radial-gradient(ellipse 90% 78% at 50% 45%, transparent 25%, #150503 100%);
+  }
+
   /* --- Revelado al hacer scroll --- */
   .revelar {
     opacity: 0;

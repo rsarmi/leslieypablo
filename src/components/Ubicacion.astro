@@ -11,7 +11,7 @@ import Ornamento from './Ornamento.astro';
     <div class="revelar space-y-10">
       <div>
         <p class="eyebrow mb-3">Cuándo</p>
-        <p class="font-display text-bone text-4xl sm:text-5xl">{boda.fecha.displayLargo}</p>
+        <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.fecha.displayLargo}</p>
         <p class="text-bone-dim mt-3 font-mono text-xs tracking-[0.22em] uppercase">
           {boda.fecha.horaInicio} — {boda.fecha.horaFin}
         </p>
@@ -21,7 +21,7 @@ import Ornamento from './Ornamento.astro';
 
       <div>
         <p class="eyebrow mb-3">Dónde</p>
-        <p class="font-display text-bone text-4xl sm:text-5xl">{boda.venue.nombre}</p>
+        <p class="display text-bone text-2xl leading-tight sm:text-3xl">{boda.venue.nombre}</p>
         <address class="text-bone-dim mt-3 text-lg not-italic">
           {boda.venue.calle}<br />
           {boda.venue.colonia} · {boda.venue.ciudad}
@@ -56,7 +56,7 @@ import Ornamento from './Ornamento.astro';
   <div class="mt-20 grid gap-px sm:grid-cols-3" style="background:color-mix(in srgb, var(--color-brass) 20%, transparent)">
     {
       boda.detalles.map((detalle) => (
-        <article class="revelar bg-ink px-7 py-9 text-center">
+        <article class="revelar bg-ink/55 px-7 py-9 text-center">
           <h3 class="text-bone mb-4 text-2xl">{detalle.titulo}</h3>
           <p class="text-bone-dim text-base leading-relaxed">{detalle.texto}</p>
         </article>

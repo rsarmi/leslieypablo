@@ -27,8 +27,9 @@ export const boda = {
     dia: '31',
     mes: 'Octubre',
     anio: '2026',
-    /** Romano, para el hero. */
-    displayCorto: 'XXXI · X · MMXXVI',
+    /** La marca del save-the-date. Va en blackletter verde ácido. */
+    marca: '31·10·26',
+    displayCorto: '31 · 10 · 26',
     displayLargo: 'Sábado 31 de octubre de 2026',
     horaInicio: '5:00 pm',
     horaFin: '2:00 am',
@@ -73,21 +74,6 @@ export const boda = {
     subtitulo: 'Goth black tie',
     intro:
       'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo, de negro, y sin miedo al drama.',
-    si: [
-      'Vestido largo o smoking negro',
-      'Terciopelo, encaje, seda, brocado',
-      'Negro absoluto y vino profundo',
-      'Joyería pesada, plata y oro viejo',
-      'Guantes, velos, capas, corsés',
-      'Maquillaje dramático',
-    ],
-    no: [
-      'Colores claros o pasteles',
-      'Blanco, marfil o crema',
-      'Jeans, tenis, ropa casual',
-      'Disfraces de Halloween',
-      'Estampados llamativos',
-    ],
     nota:
       'Sí, es 31 de octubre. No, no es una fiesta de disfraces. Piensen en una casa noble en luto, no en una tienda de disfraces.',
   },
@@ -179,6 +165,13 @@ export const boda = {
     endpoint:
       'https://script.google.com/macros/s/AKfycbxUa7YJyV63KQwpbPJSibjXcBKAB9Wy3LkBFbxljL-2ZXJOSJH8WS7m3pqA3MSr5Xv_/exec',
   },
+
+  /** Tríptico de la portada. Van en public/fotos/. */
+  portada: [
+    { src: 'fotos/novios-1.jpg', alt: 'Leslie y Pablo de noche, bajo luz roja' },
+    { src: 'fotos/novios-2.jpg', alt: 'Leslie y Pablo riéndose, de frente' },
+    { src: 'fotos/novios-3.jpg', alt: 'Leslie y Pablo abrazados' },
+  ],
 
   moodboard: {
     intro:

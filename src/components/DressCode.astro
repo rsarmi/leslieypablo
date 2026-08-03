@@ -1,7 +1,6 @@
 ---
 import { boda } from '../config/boda';
 import Seccion from './Seccion.astro';
-import Ornamento from './Ornamento.astro';
 
 const { dressCode } = boda;
 ---
@@ -12,47 +11,13 @@ const { dressCode } = boda;
   titulo={dressCode.titulo}
   intro={dressCode.intro}
   fondo="sangre"
-  ancho="ancho"
+  ancho="estrecho"
 >
-  <p
-    class="revelar font-display text-blood -mt-6 mb-16 text-center text-[clamp(2rem,7vw,3.5rem)] leading-none"
-  >
+  <p class="revelar display text-acid -mt-4 text-center text-[clamp(1.5rem,5vw,2.75rem)] leading-tight">
     {dressCode.subtitulo}
   </p>
 
-  <div class="grid gap-12 sm:grid-cols-2 sm:gap-16">
-    <div class="revelar">
-      <h3 class="text-bone mb-6 flex items-center gap-3 text-2xl">
-        <Ornamento tipo="rombo" class="text-brass h-4 w-4 shrink-0" />
-        Sí
-      </h3>
-      <ul class="space-y-3">
-        {
-          dressCode.si.map((item) => (
-            <li class="text-bone-dim border-brass/15 border-b pb-3 text-lg last:border-0">{item}</li>
-          ))
-        }
-      </ul>
-    </div>
-
-    <div class="revelar">
-      <h3 class="text-bone mb-6 flex items-center gap-3 text-2xl">
-        <Ornamento tipo="rombo" class="text-ash h-4 w-4 shrink-0" />
-        No
-      </h3>
-      <ul class="space-y-3">
-        {
-          dressCode.no.map((item) => (
-            <li class="text-ash border-brass/15 border-b pb-3 text-lg line-through decoration-1 last:border-0">
-              {item}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </div>
-
-  <div class="revelar border-brass/30 mt-16 border-l-2 py-2 pl-6 sm:pl-8">
+  <div class="revelar border-brass/30 mt-14 border-l-2 py-2 pl-6 sm:pl-8">
     <p class="text-bone-dim text-lg italic sm:text-xl">{dressCode.nota}</p>
   </div>
 

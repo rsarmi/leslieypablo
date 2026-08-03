@@ -22,12 +22,15 @@ const { titulo = boda.meta.titulo } = Astro.props;
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
     <meta name="googlebot" content="noindex, nofollow" />
 
-    <meta name="theme-color" content="#0b0708" />
+    <meta name="theme-color" content="#2a0907" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" href={ruta('favicon.svg')} type="image/svg+xml" />
   </head>
 
   <body>
+    <!-- Ojo de gato: el degradado rojo fijo sobre el que vive todo el sitio. -->
+    <div class="ojo" aria-hidden="true"></div>
+
     <!-- Grano de película: es lo que más acerca la pantalla al moodboard impreso. -->
     <div class="grano" aria-hidden="true"></div>
 
