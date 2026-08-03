@@ -32,7 +32,7 @@ export const boda = {
     displayCorto: '31 · 10 · 26',
     displayLargo: 'Sábado 31 de octubre de 2026',
     horaInicio: '5:00 pm',
-    horaFin: '2:00 am',
+    horaFin: '1:00 am',
     /** Hasta cuándo se puede confirmar. */
     limiteRsvp: PENDIENTE('30 de septiembre de 2026'),
   },
