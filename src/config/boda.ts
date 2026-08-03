@@ -68,29 +68,15 @@ export const boda = {
 
   comoLlegar: {
     intro:
-      'El salón está en la Colonia Guerrero, a unas cuadras del Monumento a la Revolución. Es una zona de calles angostas y estacionamiento complicado: vale la pena planear la llegada y sobre todo la salida.',
+      'El salón está en la Colonia Guerrero, a unas cuadras del Monumento a la Revolución.',
     bloques: [
       {
         titulo: 'Estacionamiento',
-        texto: PENDIENTE(
-          'Habrá valet en la entrada del salón. También hay estacionamientos públicos sobre Insurgentes Norte y sobre Ricardo Flores Magón a unas cuadras.'
-        ),
+        texto: 'No hay valet. Hay estacionamientos públicos a unas cuadras del salón.',
       },
       {
         titulo: 'Uber, Didi y taxi',
-        texto:
-          'Es la opción que recomendamos. La fiesta termina a la 1:00 am y va a haber barra abierta buena parte de la noche. Pidan su viaje desde la puerta del salón, no caminando por la colonia.',
-      },
-      {
-        titulo: 'Metro y Metrobús',
-        texto: PENDIENTE(
-          'Las estaciones más cercanas son Guerrero (Líneas 3 y B) y Revolución (Línea 2). Sirven para llegar, pero a esa hora de la madrugada ya están cerradas.'
-        ),
-      },
-      {
-        titulo: 'Al salir',
-        texto:
-          'Habrá seguridad en la puerta hasta el final del evento. Salgan acompañados y esperen su coche dentro del salón, no en la banqueta.',
+        texto: 'Es la forma más cómoda de llegar y de irse.',
       },
     ],
   },
