@@ -28,8 +28,13 @@ const { titulo = boda.meta.titulo } = Astro.props;
   </head>
 
   <body>
-    <!-- Ojo de gato: el degradado rojo fijo sobre el que vive todo el sitio. -->
-    <div class="ojo" aria-hidden="true"></div>
+    <!-- Terciopelo + brocado + ojo de gato: el fondo fijo de todo el sitio. -->
+    <div
+      class="ojo"
+      style={`--tex-damasco:url('${ruta('texturas/damasco.jpg')}');--tex-terciopelo:url('${ruta('texturas/terciopelo.jpg')}')`}
+      aria-hidden="true"
+    >
+    </div>
 
     <!-- Grano de película: es lo que más acerca la pantalla al moodboard impreso. -->
     <div class="grano" aria-hidden="true"></div>
@@ -76,7 +81,7 @@ const { titulo = boda.meta.titulo } = Astro.props;
         inset: -50%;
         z-index: 9999;
         pointer-events: none;
-        opacity: 0.3;
+        opacity: 0.18;
         mix-blend-mode: overlay;
         background-image:
           url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)'/%3E%3C/svg%3E"),
@@ -97,27 +102,27 @@ const { titulo = boda.meta.titulo } = Astro.props;
         @keyframes granear {
           0% {
             transform: translate(0, 0);
-            opacity: 0.3;
+            opacity: 0.18;
           }
           20% {
             transform: translate(-2%, 1%);
-            opacity: 0.34;
+            opacity: 0.21;
           }
           40% {
             transform: translate(1%, -2%);
-            opacity: 0.27;
+            opacity: 0.15;
           }
           60% {
             transform: translate(-1%, -1%);
-            opacity: 0.33;
+            opacity: 0.2;
           }
           80% {
             transform: translate(2%, 1%);
-            opacity: 0.29;
+            opacity: 0.17;
           }
           100% {
             transform: translate(0, 0);
-            opacity: 0.3;
+            opacity: 0.18;
           }
         }
       }

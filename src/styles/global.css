@@ -279,36 +279,50 @@
 
 @layer utilities {
   /*
-   * --- Ojo de gato ---
-   * Capa fija bajo todo el contenido. Tres degradados apilados:
-   *   1. la pupila: una rendija vertical, lo más encendido del rojo
-   *   2. el iris: una elipse ancha y baja, la forma del ojo
+   * --- Fondo: terciopelo, brocado y ojo de gato ---
+   *
+   * Una sola capa fija bajo todo el contenido, con cinco fondos apilados.
+   * De arriba hacia abajo (el orden de `background-image` es ese):
+   *   1. la pupila: brillo tenue en el centro
+   *   2. el iris: elipse ancha y baja, la forma del ojo
    *   3. la viñeta: hunde las esquinas hasta casi negro
-   * Fija (no scrollea) para que el sitio entero se sienta iluminado desde
-   * un mismo punto, como el moodboard.
+   *   4. el damasco: papel tapiz repetido, en `overlay` para que se lea como
+   *      relieve del tejido y no como una calca encima
+   *   5. el terciopelo: la tela de base, a `cover`
+   *
+   * Los degradados van en rgba y no en hex opaco justamente para que la tela
+   * se siga viendo a través de ellos. Es fija (no scrollea) para que el sitio
+   * entero se sienta iluminado desde un mismo punto.
    */
   .ojo {
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background:
-      /* La pupila va muy tenue: si se marca, se lee como una franja de luz
-         mal puesta en vez de como el brillo del centro del ojo. */
+    background-color: #2a0907;
+    background-image:
       radial-gradient(
         ellipse 26% 44% at 50% 38%,
-        rgba(224, 112, 52, 0.22) 0%,
-        rgba(196, 65, 23, 0.1) 45%,
+        rgba(224, 112, 52, 0.2) 0%,
+        rgba(196, 65, 23, 0.08) 45%,
         transparent 76%
       ),
       radial-gradient(
         ellipse 130% 48% at 50% 40%,
-        #8a2411 0%,
-        #5e150e 30%,
-        #380d09 58%,
-        transparent 80%
+        rgba(138, 36, 17, 0.62) 0%,
+        rgba(94, 21, 14, 0.5) 30%,
+        rgba(56, 13, 9, 0.55) 58%,
+        transparent 82%
       ),
-      radial-gradient(ellipse 90% 78% at 50% 45%, transparent 25%, #150503 100%);
+      radial-gradient(ellipse 90% 78% at 50% 45%, transparent 22%, rgba(21, 5, 3, 0.96) 100%),
+      /* Las URLs llegan desde Base.astro, que es donde se puede aplicar el
+         `base` del sitio; en CSS una ruta absoluta rompería en /leslieypablo. */
+      var(--tex-damasco),
+      var(--tex-terciopelo);
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat;
+    background-size: auto, auto, auto, 300px 300px, cover;
+    background-position: center, center, center, center, center;
+    background-blend-mode: normal, normal, normal, overlay, normal;
   }
 
   /* --- Revelado al hacer scroll --- */

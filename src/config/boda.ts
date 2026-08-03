@@ -56,8 +56,7 @@ export const boda = {
     subtitulo: 'Goth black tie',
     intro:
       'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo, de negro, y sin miedo al drama.',
-    nota:
-      'Sí, es 31 de octubre. No, no es una fiesta de disfraces. Piensen en una casa noble en luto, no en una tienda de disfraces.',
+    nota: 'Sí, es 31 de octubre. No, no es una fiesta de disfraces.',
   },
 
   regalos: {
