@@ -35,15 +35,4 @@ import Seccion from './Seccion.astro';
     </div>
   </div>
 
-  {/* Los tres bloques de detalle */}
-  <div class="mt-20 grid gap-px sm:grid-cols-3" style="background:color-mix(in srgb, var(--color-brass) 20%, transparent)">
-    {
-      boda.detalles.map((detalle) => (
-        <article class="revelar bg-ink/55 px-7 py-9 text-center">
-          <h3 class="text-bone mb-4 text-2xl">{detalle.titulo}</h3>
-          <p class="text-bone-dim text-base leading-relaxed">{detalle.texto}</p>
-        </article>
-      ))
-    }
-  </div>
 </Seccion>

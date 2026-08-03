@@ -51,22 +51,6 @@ export const boda = {
       'https://www.google.com/maps?q=Sal%C3%B3n%20Los%20%C3%81ngeles%2C%20Lerdo%20206%2C%20Guerrero%2C%20CDMX&output=embed',
   },
 
-  /** Bloques cortos que aparecen en la sección "La boda". */
-  detalles: [
-    {
-      titulo: 'Ceremonia civil',
-      texto: 'La ceremonia se celebra en el mismo salón al comenzar la noche. No hay que trasladarse a ningún otro lugar.',
-    },
-    {
-      titulo: 'La cena',
-      texto: 'Canapés mexicanos en la recepción, tacos de guisado para la cena, mesa de dulces, y tacos de canasta en la tornaboda.',
-    },
-    {
-      titulo: 'La música',
-      texto: 'Mariachi, banda de cumbia, DJ y una banda de amigos con instrumentos. Vengan preparados para bailar hasta la una.',
-    },
-  ],
-
   dressCode: {
     titulo: 'Etiqueta rigurosa',
     subtitulo: 'Goth black tie',

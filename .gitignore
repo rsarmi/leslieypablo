@@ -7,13 +7,12 @@ dist/
 .env.*
 .playwright-mcp/
 
-# Material de referencia, no assets del sitio. Se queda local a propósito:
-# este repo es público y varias de esas imágenes son de terceros (el cartel de
-# Nosferatu, la pintura de Waterhouse). Las imágenes que sí se publican van en
-# public/moodboard/.
-moodboard/
-
-# Originales de las fotos tal como llegaron por WhatsApp. Las versiones
-# optimizadas que sí publica el sitio viven en public/fotos/.
-fotos/
+# Originales tal como llegaron por WhatsApp: material de trabajo, no assets.
+# Las versiones optimizadas que sí publica el sitio viven en public/moodboard/
+# y public/fotos/, y esas SÍ se versionan.
+#
+# La diagonal inicial es obligatoria: sin ella el patrón matchea cualquier
+# carpeta con ese nombre a cualquier profundidad, incluidas las de public/.
+/moodboard/
+/fotos/
 
