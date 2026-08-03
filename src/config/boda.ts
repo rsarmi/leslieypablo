@@ -63,7 +63,7 @@ export const boda = {
     },
     {
       titulo: 'La música',
-      texto: 'Mariachi, banda de cumbia, DJ y una banda de amigos con instrumentos. Vengan preparados para bailar hasta las dos.',
+      texto: 'Mariachi, banda de cumbia, DJ y una banda de amigos con instrumentos. Vengan preparados para bailar hasta la una.',
     },
   ],
 
@@ -95,12 +95,12 @@ export const boda = {
       {
         titulo: 'Uber, Didi y taxi',
         texto:
-          'Es la opción que recomendamos. La fiesta termina a las 2:00 am y va a haber barra abierta buena parte de la noche. Pidan su viaje desde la puerta del salón, no caminando por la colonia.',
+          'Es la opción que recomendamos. La fiesta termina a la 1:00 am y va a haber barra abierta buena parte de la noche. Pidan su viaje desde la puerta del salón, no caminando por la colonia.',
       },
       {
         titulo: 'Metro y Metrobús',
         texto: PENDIENTE(
-          'Las estaciones más cercanas son Guerrero (Líneas 3 y B) y Revolución (Línea 2). Sirven para llegar, pero a las 2:00 am ya están cerradas.'
+          'Las estaciones más cercanas son Guerrero (Líneas 3 y B) y Revolución (Línea 2). Sirven para llegar, pero a esa hora de la madrugada ya están cerradas.'
         ),
       },
       {
@@ -150,7 +150,7 @@ export const boda = {
     {
       pregunta: '¿Hasta qué hora es?',
       respuesta:
-        'La tornaboda con tacos de canasta va hasta las 2:00 am. Duerman la siesta.',
+        'La tornaboda con tacos de canasta va hasta la 1:00 am. Duerman la siesta.',
     },
   ],
 
@@ -175,32 +175,78 @@ export const boda = {
     intro:
       'Terciopelo, encaje, latón viejo y corazones atravesados. Esto es lo que tenemos en la cabeza para la noche.',
     /**
-     * 18 huecos del mosaico. Hoy son placeholders.
+     * Las 12 referencias, optimizadas en `public/moodboard/`.
      *
-     * Para poner una imagen: guardarla en `public/moodboard/` y llenar `src`
-     * (ruta desde la raíz del sitio) y `alt`. El hueco se convierte solo en
-     * imagen con lightbox, SIN recortarse: conserva su proporción real.
-     * `ratio` solo da altura al hueco mientras no haya imagen.
+     * Ninguna se recorta: cada una conserva su proporción real y el mosaico
+     * se acomoda alrededor. `ratio` solo le da altura a un hueco cuando `src`
+     * está vacío, así que para agregar una referencia nueva basta con dejar
+     * `src` y `alt` llenos.
+     *
+     * El orden importa: el mosaico llena por columnas, así que están
+     * intercaladas para que las piezas gráficas (tarjetas, carteles) no
+     * queden todas juntas.
      */
     items: [
-      { ratio: '2 / 3', src: '', alt: '' },
-      { ratio: '1 / 1', src: '', alt: '' },
-      { ratio: '3 / 4', src: '', alt: '' },
-      { ratio: '4 / 3', src: '', alt: '' },
-      { ratio: '2 / 3', src: '', alt: '' },
-      { ratio: '1 / 1', src: '', alt: '' },
-      { ratio: '3 / 4', src: '', alt: '' },
-      { ratio: '3 / 2', src: '', alt: '' },
-      { ratio: '2 / 3', src: '', alt: '' },
-      { ratio: '4 / 5', src: '', alt: '' },
-      { ratio: '1 / 1', src: '', alt: '' },
-      { ratio: '2 / 3', src: '', alt: '' },
-      { ratio: '4 / 3', src: '', alt: '' },
-      { ratio: '3 / 4', src: '', alt: '' },
-      { ratio: '2 / 3', src: '', alt: '' },
-      { ratio: '1 / 1', src: '', alt: '' },
-      { ratio: '3 / 2', src: '', alt: '' },
-      { ratio: '3 / 4', src: '', alt: '' },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/lovers-enemies.jpg',
+        alt: 'Tarjeta «Lovers to Enemies» sostenida por una mano con guante de encaje negro',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/puerta-roja.jpg',
+        alt: 'Figura encapuchada recortada contra un portal de luz roja',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/nosferatu.jpg',
+        alt: 'Cartel de Nosferatu: una mano pálida saliendo de un ataúd',
+      },
+      {
+        ratio: '1 / 1',
+        src: 'moodboard/murcielago.jpg',
+        alt: 'Murciélago negro grabado sobre papel rojo',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/retrato-murcielago.jpg',
+        alt: 'Retrato al óleo de una mujer de encaje blanco sosteniendo un murciélago',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/corazon-espadas.jpg',
+        alt: 'Corazón rojo atravesado por tres espadas',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/circe.jpg',
+        alt: 'Circe Invidiosa de Waterhouse, vertiendo una copa de líquido rojo',
+      },
+      {
+        ratio: '1 / 1',
+        src: 'moodboard/sobre-rojo.jpg',
+        alt: 'Invitación en sobre de terciopelo rojo sobre una charola de plata',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/niebla-cuernos.jpg',
+        alt: 'Silueta con cuernos entre niebla roja',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/catedral.jpg',
+        alt: 'Figura encapuchada bajo el arco tallado de una catedral, teñida de rojo',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/fuego.jpg',
+        alt: 'Mujer de vestido largo caminando hacia una pared de fuego',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/invitacion.jpg',
+        alt: 'Invitación grabada en rojo y negro con un corazón atravesado por dagas',
+      },
     ],
   },
 
