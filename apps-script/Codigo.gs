@@ -42,17 +42,13 @@ var COLUMNA_NOMBRE = 'Nombre';
  */
 var COLUMNAS_WEB = ['Confirmó web', 'Fecha confirmación', 'Mail', 'Telefono'];
 
-var COLUMNAS_RESPUESTAS = [
-  'Timestamp',
-  'Nombre completo',
-  'Contacto',
-  '¿Asiste?',
-  'Acompañantes',
-  'Nombres acompañantes',
-  'Total personas',
-  'Canción',
-  'Mensaje',
-];
+/**
+ * El formulario abierto pide exactamente lo mismo que la confirmación normal.
+ * También se localizan por encabezado, así que las columnas viejas que hayan
+ * quedado de antes (Contacto, Acompañantes, Canción…) se pueden borrar a mano
+ * sin romper nada.
+ */
+var COLUMNAS_RESPUESTAS = ['Timestamp', 'Nombre completo', '¿Asiste?', 'Mail', 'Telefono'];
 
 var CLAVES_CONFIG = [
   ['password', 'CAMBIAR-ESTA-CONTRASENA'],
@@ -90,23 +86,16 @@ function instalar() {
   var respuestas = libro.getSheetByName(HOJA_RESPUESTAS);
   if (!respuestas) {
     respuestas = libro.insertSheet(HOJA_RESPUESTAS);
-    respuestas
-      .getRange(1, 1, 1, COLUMNAS_RESPUESTAS.length)
-      .setValues([COLUMNAS_RESPUESTAS])
-      .setFontWeight('bold');
     respuestas.setFrozenRows(1);
-    respuestas.setColumnWidth(1, 160);
-    respuestas.setColumnWidth(2, 220);
-    respuestas.setColumnWidth(3, 200);
-    respuestas.setColumnWidth(6, 320);
-    respuestas.setColumnWidth(9, 400);
   }
+  asegurarColumnas(respuestas, COLUMNAS_RESPUESTAS);
+  Logger.log('Columnas listas en "%s".', HOJA_RESPUESTAS);
 
   var invitados = libro.getSheetByName(HOJA_INVITADOS);
   if (!invitados) {
     Logger.log('OJO: no existe la pestaña "%s". El buscador no va a funcionar.', HOJA_INVITADOS);
   } else {
-    asegurarColumnasWeb(invitados);
+    asegurarColumnas(invitados, COLUMNAS_WEB);
     Logger.log('Columnas del sitio listas en "%s".', HOJA_INVITADOS);
   }
 
@@ -114,47 +103,54 @@ function instalar() {
 }
 
 /**
- * Devuelve los índices (base 1) de las columnas que escribe el sitio,
- * creándolas al final de la hoja si todavía no existen.
+ * Devuelve los índices (base 1) de las columnas pedidas, creando al final de la
+ * hoja las que falten.
  *
- * Se buscan por nombre de encabezado y no por posición fija: los novios siguen
- * editando la hoja y pueden insertar columnas en medio en cualquier momento.
+ * Se localizan por nombre de encabezado y no por posición fija: los novios
+ * siguen editando la hoja y pueden insertar, mover o borrar columnas en
+ * cualquier momento sin que el sitio escriba en el lugar equivocado.
  */
-function asegurarColumnasWeb(hoja) {
+function asegurarColumnas(hoja, nombres) {
   var ultima = hoja.getLastColumn();
 
   // Una hoja recién creada no tiene ni encabezados: getRange(...,0) reventaría.
   var encabezados = ultima > 0 ? hoja.getRange(1, 1, 1, ultima).getValues()[0] : [];
 
   var indices = {};
-  var faltantes = [];
+  var creadas = 0;
 
-  for (var i = 0; i < COLUMNAS_WEB.length; i++) {
+  for (var i = 0; i < nombres.length; i++) {
     var pos = -1;
+
     for (var j = 0; j < encabezados.length; j++) {
-      if (String(encabezados[j]).trim() === COLUMNAS_WEB[i]) {
+      if (String(encabezados[j]).trim() === nombres[i]) {
         pos = j + 1;
         break;
       }
     }
-    if (pos === -1) faltantes.push(COLUMNAS_WEB[i]);
-    indices[COLUMNAS_WEB[i]] = pos;
-  }
 
-  // Las que falten se agregan al final, después de todo lo que ya haya.
-  for (var k = 0; k < faltantes.length; k++) {
-    ultima += 1;
-    hoja.getRange(1, ultima).setValue(faltantes[k]).setFontWeight('bold');
-    indices[faltantes[k]] = ultima;
+    if (pos === -1) {
+      // Al final, después de todo lo que ya haya.
+      ultima += 1;
+      pos = ultima;
+      creadas++;
+      hoja.getRange(1, pos).setValue(nombres[i]).setFontWeight('bold');
+    }
+
+    indices[nombres[i]] = pos;
   }
 
   // El ancho se calcula con `ultima`, que ya trae la cuenta exacta, y no con
   // otro getLastColumn(): las columnas recién escritas podrían no estar
   // reflejadas todavía y se les pondría el ancho a las equivocadas.
-  if (faltantes.length) {
-    hoja.setColumnWidths(ultima - faltantes.length + 1, faltantes.length, 170);
-  }
+  if (creadas) hoja.setColumnWidths(ultima - creadas + 1, creadas, 170);
 
+  return indices;
+}
+
+/** Los índices de las columnas de `Invitados` que escribe el sitio. */
+function asegurarColumnasWeb(hoja) {
+  var indices = asegurarColumnas(hoja, COLUMNAS_WEB);
   return {
     confirmo: indices[COLUMNAS_WEB[0]],
     fecha: indices[COLUMNAS_WEB[1]],
@@ -304,16 +300,9 @@ function confirmarInvitado(datos) {
   var telefono = texto(datos.telefono, 60);
 
   if (fila < 2 || !nombreEsperado) return { ok: false, error: 'datos_invalidos' };
-  if (!mail || !telefono) return { ok: false, error: 'campos_requeridos' };
 
-  // Validación mínima: no sirve para bloquear a nadie, sirve para que no se
-  // cuele un teléfono en la columna del correo por un descuido.
-  if (mail.indexOf('@') < 1 || mail.indexOf('.') === -1) {
-    return { ok: false, error: 'mail_invalido' };
-  }
-  if (telefono.replace(/[^0-9]/g, '').length < 8) {
-    return { ok: false, error: 'telefono_invalido' };
-  }
+  var problema = validarContacto(nombreEsperado, mail, telefono);
+  if (problema) return { ok: false, error: problema };
 
   var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_INVITADOS);
   if (!hoja) return { ok: false, error: 'falta_hoja_invitados' };
@@ -537,45 +526,43 @@ function guardarRsvp(datos) {
   if (!hoja) return { ok: false, error: 'falta_hoja_respuestas' };
 
   var nombre = texto(datos.nombre, 120);
-  var contacto = texto(datos.contacto, 120);
-  if (!nombre || !contacto) return { ok: false, error: 'campos_requeridos' };
-
+  var mail = texto(datos.mail, 120);
+  var telefono = texto(datos.telefono, 60);
   var asiste = datos.asiste === 'si' ? 'Sí' : 'No';
 
-  // Si no asiste, los acompañantes no cuentan aunque el cliente los mande.
-  var acompanantes = asiste === 'Sí' ? entero(datos.acompanantes, 0, 10) : 0;
+  var problema = validarContacto(nombre, mail, telefono);
+  if (problema) return { ok: false, error: problema };
 
-  var nombresLista = Array.isArray(datos.nombresAcompanantes) ? datos.nombresAcompanantes : [];
-  var nombres = nombresLista
-    .slice(0, acompanantes)
-    .map(function (n) {
-      return texto(n, 120);
-    })
-    .filter(function (n) {
-      return n.length > 0;
-    })
-    .join(', ');
-
-  // El bloqueo evita que dos personas que confirman al mismo tiempo pisen la misma fila.
+  // El bloqueo evita que dos personas que envían al mismo tiempo pisen la misma fila.
   var candado = LockService.getScriptLock();
   candado.waitLock(20000);
   try {
-    hoja.appendRow([
-      new Date(),
-      nombre,
-      contacto,
-      asiste,
-      acompanantes,
-      nombres,
-      asiste === 'Sí' ? acompanantes + 1 : 0,
-      texto(datos.cancion, 200),
-      texto(datos.mensaje, 1500),
-    ]);
+    var col = asegurarColumnas(hoja, COLUMNAS_RESPUESTAS);
+    var fila = hoja.getLastRow() + 1;
+
+    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[0]]).setValue(new Date());
+    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[1]]).setValue(nombre);
+    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[2]]).setValue(asiste);
+    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[3]]).setValue(mail);
+    // Como texto: si no, Sheets se come el + del código de país y los ceros.
+    hoja.getRange(fila, col[COLUMNAS_RESPUESTAS[4]]).setValue(telefono).setNumberFormat('@');
   } finally {
     candado.releaseLock();
   }
 
   return { ok: true };
+}
+
+/**
+ * Validación mínima compartida por los dos caminos. No pretende bloquear a
+ * nadie: sirve para que no se cuele un teléfono en la columna del correo.
+ * Devuelve el código del problema, o null si todo va bien.
+ */
+function validarContacto(nombre, mail, telefono) {
+  if (!nombre || !mail || !telefono) return 'campos_requeridos';
+  if (mail.indexOf('@') < 1 || mail.indexOf('.') === -1) return 'mail_invalido';
+  if (telefono.replace(/[^0-9]/g, '').length < 8) return 'telefono_invalido';
+  return null;
 }
 
 // ---------------------------------------------------------------------------

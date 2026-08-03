@@ -164,20 +164,6 @@ import Ornamento from './Ornamento.astro';
             />
           </div>
 
-          <div>
-            <label class="etiqueta" for="rsvp-contacto">Teléfono o correo *</label>
-            <input
-              id="rsvp-contacto"
-              name="contacto"
-              type="text"
-              class="campo"
-              autocomplete="tel"
-              placeholder="Para poder avisarles cualquier cambio"
-              required
-              maxlength="120"
-            />
-          </div>
-
           <fieldset>
             <legend class="etiqueta">¿Nos acompañas? *</legend>
             <div class="grid gap-3 sm:grid-cols-2">
@@ -192,28 +178,34 @@ import Ornamento from './Ornamento.astro';
             </div>
           </fieldset>
 
-          {/* Solo tiene sentido si asisten */}
-          <div id="rsvp-si">
-            <label class="etiqueta" for="rsvp-cancion">Una canción que no puede faltar</label>
+          <div>
+            <label class="etiqueta" for="rsvp-mail">Correo *</label>
             <input
-              id="rsvp-cancion"
-              name="cancion"
-              type="text"
+              id="rsvp-mail"
+              name="mail"
+              type="email"
               class="campo"
-              placeholder="La que te va a sacar a bailar"
-              maxlength="200"
+              autocomplete="email"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="tu@correo.com"
+              maxlength="120"
             />
           </div>
 
           <div>
-            <label class="etiqueta" for="rsvp-mensaje">Mensaje para nosotros</label>
-            <textarea
-              id="rsvp-mensaje"
-              name="mensaje"
-              class="campo resize-y"
-              rows="4"
-              placeholder="Restricciones alimenticias, alergias, o lo que quieran decirnos"
-              maxlength="1500"></textarea>
+            <label class="etiqueta" for="rsvp-telefono">Teléfono *</label>
+            <input
+              id="rsvp-telefono"
+              name="telefono"
+              type="tel"
+              class="campo"
+              autocomplete="tel"
+              inputmode="tel"
+              placeholder="Con WhatsApp, para avisarte cualquier cambio"
+              maxlength="60"
+            />
           </div>
         </div>
 
@@ -248,6 +240,7 @@ import Ornamento from './Ornamento.astro';
     servidor: 'Algo falló. Inténtenlo en un momento',
     sin_configurar: 'El formulario aún no está conectado',
     campos_requeridos: 'Faltan el correo o el teléfono',
+    falta_nombre: 'Falta tu nombre',
     consulta_corta: 'Escriban al menos tres letras',
     fila_cambio: 'La lista cambió. Búsquense otra vez, por favor',
     mail_invalido: 'Ese correo no se ve bien. Revísenlo',
@@ -527,56 +520,44 @@ import Ornamento from './Ornamento.astro';
   const form = $<HTMLFormElement>('rsvp-form');
   const boton = $<HTMLButtonElement>('rsvp-boton');
   const error = $('rsvp-error');
-  const bloqueSi = $('rsvp-si');
 
   const inputNombre = $<HTMLInputElement>('rsvp-nombre');
-  const inputContacto = $<HTMLInputElement>('rsvp-contacto');
-  const inputCancion = $<HTMLInputElement>('rsvp-cancion');
-  const inputMensaje = $<HTMLTextAreaElement>('rsvp-mensaje');
-
-  function asiste(): boolean {
-    return (form.querySelector('input[name="asiste"]:checked') as HTMLInputElement)?.value === 'si';
-  }
-
-  /** A quien no viene no tiene caso preguntarle qué canción quiere oír. */
-  function sincronizarAsistencia() {
-    bloqueSi.classList.toggle('hidden', !asiste());
-  }
-
-  form.querySelectorAll('input[name="asiste"]').forEach((radio) => {
-    radio.addEventListener('change', sincronizarAsistencia);
-  });
+  const inputMail = $<HTMLInputElement>('rsvp-mail');
+  const inputTelefono = $<HTMLInputElement>('rsvp-telefono');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     error.textContent = '';
 
     const nombre = inputNombre.value.trim();
-    const contacto = inputContacto.value.trim();
+    const mail = inputMail.value.trim();
+    const telefono = inputTelefono.value.trim();
 
-    // Validación en el cliente para no gastar un viaje al servidor.
-    for (const [campo, valor] of [
-      [inputNombre, nombre],
-      [inputContacto, contacto],
-    ] as const) {
-      if (!valor) {
-        campo.setAttribute('aria-invalid', 'true');
-        campo.focus();
-        error.textContent = 'Falta el nombre o el contacto';
-        return;
-      }
+    // Las mismas reglas que valida el servidor, para no gastar un viaje.
+    const problemas: [HTMLInputElement, boolean, string][] = [
+      [inputNombre, !nombre, 'falta_nombre'],
+      [inputMail, !mail, 'campos_requeridos'],
+      [inputMail, mail.indexOf('@') < 1 || !mail.includes('.'), 'mail_invalido'],
+      [inputTelefono, !telefono, 'campos_requeridos'],
+      [inputTelefono, telefono.replace(/\D/g, '').length < 8, 'telefono_invalido'],
+    ];
+
+    for (const campo of [inputNombre, inputMail, inputTelefono]) {
       campo.setAttribute('aria-invalid', 'false');
     }
 
-    const viene = asiste();
+    for (const [campo, falla, codigo] of problemas) {
+      if (!falla) continue;
+      campo.setAttribute('aria-invalid', 'true');
+      campo.focus();
+      error.textContent = MENSAJES[codigo];
+      return;
+    }
 
-    const datos: DatosRsvp = {
-      nombre,
-      contacto,
-      asiste: viene ? 'si' : 'no',
-      cancion: viene ? inputCancion.value.trim() : '',
-      mensaje: inputMensaje.value.trim(),
-    };
+    const viene =
+      (form.querySelector('input[name="asiste"]:checked') as HTMLInputElement)?.value === 'si';
+
+    const datos: DatosRsvp = { nombre, asiste: viene ? 'si' : 'no', mail, telefono };
 
     boton.disabled = true;
     boton.textContent = 'Enviando…';
@@ -596,12 +577,9 @@ import Ornamento from './Ornamento.astro';
       : 'Gracias por avisarnos. Te vamos a extrañar esa noche.';
 
     form.reset();
-    sincronizarAsistencia();
     mostrarPaso('exito');
     $('paso-exito').scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
-
-  sincronizarAsistencia();
 </script>
 
 <style>

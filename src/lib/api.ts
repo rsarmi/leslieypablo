@@ -69,13 +69,15 @@ export interface DatosConfirmacion {
   telefono: string;
 }
 
-/** Envío del formulario abierto: una persona por respuesta, sin acompañantes. */
+/**
+ * Envío del formulario abierto. Pide exactamente lo mismo que la confirmación
+ * normal: una persona por respuesta, sin grupos.
+ */
 export interface DatosRsvp {
   nombre: string;
-  contacto: string;
   asiste: 'si' | 'no';
-  cancion: string;
-  mensaje: string;
+  mail: string;
+  telefono: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -226,15 +228,7 @@ export async function enviarRsvp(datos: DatosRsvp): Promise<ResultadoRsvp> {
   if (!password) return { ok: false, error: 'password' };
 
   try {
-    // La pestaña `Respuestas` conserva las columnas de acompañantes de cuando
-    // el formulario los pedía, así que se mandan en cero para no descuadrarla.
-    const respuesta = await postear({
-      action: 'rsvp',
-      password,
-      ...datos,
-      acompanantes: 0,
-      nombresAcompanantes: [],
-    });
+    const respuesta = await postear({ action: 'rsvp', password, ...datos });
 
     if (respuesta?.ok) return { ok: true };
 

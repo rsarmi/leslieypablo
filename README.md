@@ -104,7 +104,7 @@ Si no, la URL sigue sirviendo el código viejo. Es el error más común.
 | ------------ | ---------------------------------------------------------------------------- |
 | `Invitados`  | La lista. El sitio la **lee** para el buscador y escribe **solo** en las tres columnas que agrega al final. |
 | `Config`     | `password` y datos bancarios. Cambiarlos aquí surte efecto al instante.       |
-| `Respuestas` | Una fila por cada envío del formulario abierto (el plan B).                   |
+| `Respuestas` | Una fila por cada envío del formulario abierto (el plan B): `Timestamp`, `Nombre completo`, `¿Asiste?`, `Mail`, `Telefono`. |
 
 ---
 
@@ -169,8 +169,14 @@ consultas típicas. El umbral está en la constante `UMBRAL` de `Codigo.gs`.
 
 Hoy hay filas de la lista con solo un nombre de pila, y esas no son
 distinguibles entre sí. Por eso la pantalla tiene abajo un enlace de
-**«No me encuentro en la lista»** que abre el formulario abierto de siempre;
-esos envíos caen en `Respuestas` y se reconcilian a mano.
+**«No me encuentro en la lista»** que abre un formulario que pide lo mismo que
+la confirmación normal —nombre, si viene, correo y teléfono— y cae en
+`Respuestas` para reconciliarlo a mano. Tampoco acepta grupos: una respuesta
+por persona, igual que la lista.
+
+Las columnas de `Respuestas` también se localizan por encabezado, así que las
+que quedaron de la versión anterior del formulario (`Contacto`, `Acompañantes`,
+`Canción`, `Mensaje`…) se pueden borrar a mano cuando quieran.
 
 Cambiar la contraseña en `Config` **no requiere redesplegar el sitio**. Los
 invitados que ya habían entrado tendrán que escribirla de nuevo.
