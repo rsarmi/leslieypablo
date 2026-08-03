@@ -118,7 +118,9 @@ function instalar() {
  */
 function asegurarColumnasWeb(hoja) {
   var ultima = hoja.getLastColumn();
-  var encabezados = hoja.getRange(1, 1, 1, ultima).getValues()[0];
+
+  // Una hoja recién creada no tiene ni encabezados: getRange(...,0) reventaría.
+  var encabezados = ultima > 0 ? hoja.getRange(1, 1, 1, ultima).getValues()[0] : [];
 
   var indices = {};
   var faltantes = [];
@@ -142,7 +144,12 @@ function asegurarColumnasWeb(hoja) {
     indices[faltantes[k]] = ultima;
   }
 
-  if (faltantes.length) hoja.setColumnWidths(hoja.getLastColumn() - faltantes.length + 1, faltantes.length, 170);
+  // El ancho se calcula con `ultima`, que ya trae la cuenta exacta, y no con
+  // otro getLastColumn(): las columnas recién escritas podrían no estar
+  // reflejadas todavía y se les pondría el ancho a las equivocadas.
+  if (faltantes.length) {
+    hoja.setColumnWidths(ultima - faltantes.length + 1, faltantes.length, 170);
+  }
 
   return {
     confirmo: indices[COLUMNAS_WEB[0]],
