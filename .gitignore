@@ -13,3 +13,7 @@ dist/
 # public/moodboard/.
 moodboard/
 
+# Originales de las fotos tal como llegaron por WhatsApp. Las versiones
+# optimizadas que sí publica el sitio viven en public/fotos/.
+fotos/
+

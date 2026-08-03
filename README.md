@@ -30,6 +30,27 @@ público, así que viven en la pestaña `Config` de la Google Sheet.
 
 ---
 
+## Sistema de diseño
+
+Sacado del save-the-date en video, no inventado:
+
+| Rol | Valor |
+| --- | --- |
+| Fondo | `#2A0907` sangre cálida, con un degradado fijo de **ojo de gato** (`.ojo` en `global.css`) que ilumina el centro y hunde las esquinas |
+| Acento | **Verde ácido `#CDFC59`**, muestreado del `31·10·26` del video. Se dosifica: fecha, eyebrows, rombos, foco. Si se usa de más, deja de funcionar |
+| Títulos | `Bodoni Moda` en versalitas con tracking abierto — la voz de las referencias «LOVERS to ENEMIES» y «YOU'RE INVITED» |
+| Marca de la fecha | `Pirata One` (blackletter) en verde ácido, replicando el lockup del video |
+| Cuerpo | `Cormorant Garamond` |
+| Etiquetas y botones | `Courier Prime` en versalitas |
+
+Las secciones tienen fondo **semitransparente** a propósito: si se vuelven
+opacas tapan el degradado de ojo de gato y el sitio se aplana.
+
+Las fotos de la portada (`public/fotos/`) no llevan filtro: ya vienen en la
+paleta. Los originales están en `fotos/`, fuera del repo.
+
+---
+
 ## Moodboard
 
 18 huecos en `src/config/boda.ts` → `moodboard.items`. Hoy son placeholders.
