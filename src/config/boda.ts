@@ -132,7 +132,7 @@ export const boda = {
 
   moodboard: {
     /**
-     * Las 32 referencias, optimizadas en `public/moodboard/`.
+     * Las 34 referencias, optimizadas en `public/moodboard/`.
      *
      * Ninguna se recorta: cada una conserva su proporción real y el mosaico
      * se acomoda alrededor. `ratio` solo le da altura a un hueco cuando `src`
@@ -195,6 +195,11 @@ export const boda = {
         alt: 'Bela Lugosi como Drácula, de capa y camisa de chorreras',
       },
       {
+        ratio: '4 / 5',
+        src: 'moodboard/luto-salon.jpg',
+        alt: 'Pintura de un salón lleno de mujeres de luto, con velos y terciopelo negro',
+      },
+      {
         ratio: '3 / 4',
         src: 'moodboard/slip-guantes.jpg',
         alt: 'Vestido slip negro con guantes largos de tul, en un pasillo de hotel',
@@ -233,6 +238,11 @@ export const boda = {
         ratio: '4 / 5',
         src: 'moodboard/mano-sombra.jpg',
         alt: 'Mano de uñas largas y su sombra sobre una cortina de terciopelo rojo',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/palermo.jpg',
+        alt: 'Saco de piel dorada a la luz de un candelabro, en una cena de noche',
       },
       {
         ratio: '4 / 5',
