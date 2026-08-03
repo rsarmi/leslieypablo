@@ -16,11 +16,12 @@ import tailwindcss from '@tailwindcss/vite';
  */
 const REPO = 'leslieypablo';
 const USUARIO = 'rsarmi';
+const DOMINIO = 'leslieypablo.com';
 
 const tieneDominioPropio = existsSync(new URL('./public/CNAME', import.meta.url));
 
 export default defineConfig({
-  site: tieneDominioPropio ? 'https://lesliexpablo.com' : `https://${USUARIO}.github.io`,
+  site: tieneDominioPropio ? `https://${DOMINIO}` : `https://${USUARIO}.github.io`,
   base: tieneDominioPropio ? '/' : `/${REPO}`,
   trailingSlash: 'ignore',
   build: {

@@ -61,7 +61,7 @@ export const boda = {
 
   regalos: {
     intro:
-      'Su presencia es el regalo. Si además quieren consentirnos, la forma más útil para nosotros es una transferencia.',
+      'Su presencia es el regalo pero si además quieren consentirnos, la forma más útil para nosotros es una transferencia.',
     nota: 'Los datos aparecen aquí una vez que entraron con la contraseña.',
   },
 
@@ -71,11 +71,11 @@ export const boda = {
     bloques: [
       {
         titulo: 'Estacionamiento',
-        texto: 'No hay valet. Hay estacionamientos públicos a unas cuadras del salón.',
+        texto: 'No hay valet.',
       },
       {
         titulo: 'Uber, Didi y taxi',
-        texto: 'Es la forma más cómoda de llegar y de irse.',
+        texto: 'Es la forma más fácil de llegar y de irse.',
       },
     ],
   },
@@ -84,27 +84,22 @@ export const boda = {
     {
       pregunta: '¿A qué hora llego?',
       respuesta:
-        'La recepción abre a las 5:00 pm y la ceremonia civil empieza poco después. Lleguen a tiempo: es la parte que no se repite.',
+        'La recepción abre a las 5:00 pm y la ceremonia civil empieza poco después. Lleguen a tiempo.',
     },
     {
       pregunta: '¿Puedo llevar niños?',
-      respuesta: PENDIENTE(
-        'Es una celebración para adultos. Preferimos que esa noche los niños se queden en casa.'
-      ),
+      respuesta: 
+        'No está permitida la entrada de niños al salón.'  
     },
     {
       pregunta: '¿Qué tan estricto es el dress code?',
       respuesta:
-        'Etiqueta rigurosa y paleta negra. Si tienen duda sobre alguna prenda, revisen el moodboard o pregúntennos.',
+        'Etiqueta rigurosa y paleta negra. Si tienen duda sobre alguna prenda, revisen el moodboard.',
     },
     {
       pregunta: '¿Es una fiesta de disfraces?',
       respuesta:
         'Es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y oscuro que por disfrazarse.',
-    },
-    {
-      pregunta: '¿Hay barra libre?',
-      respuesta: PENDIENTE('Sí, habrá barra durante toda la noche, además de cocteles y aguas frescas.'),
     },
     {
       pregunta: '¿Hasta cuándo puedo confirmar?',
@@ -114,12 +109,7 @@ export const boda = {
     {
       pregunta: '¿Puedo llevar un acompañante extra?',
       respuesta:
-        'Escríbanlo en el formulario y nosotros les confirmamos. El salón tiene un cupo definido y lo vamos ajustando conforme confirman.',
-    },
-    {
-      pregunta: '¿Hasta qué hora es?',
-      respuesta:
-        'La tornaboda con tacos de canasta va hasta la 1:00 am. Duerman la siesta.',
+        'No, sólo consultando con los novios.',
     },
   ],
 
@@ -141,8 +131,6 @@ export const boda = {
   ],
 
   moodboard: {
-    intro:
-      'Terciopelo, encaje, guantes largos y oro viejo. Esto es lo que tenemos en la cabeza para la noche.',
     /**
      * Las 12 referencias, optimizadas en `public/moodboard/`.
      *
