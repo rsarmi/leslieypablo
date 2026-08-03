@@ -142,7 +142,7 @@ export const boda = {
 
   moodboard: {
     intro:
-      'Terciopelo, encaje, latón viejo y corazones atravesados. Esto es lo que tenemos en la cabeza para la noche.',
+      'Terciopelo, encaje, guantes largos y oro viejo. Esto es lo que tenemos en la cabeza para la noche.',
     /**
      * Las 12 referencias, optimizadas en `public/moodboard/`.
      *
@@ -157,64 +157,64 @@ export const boda = {
      */
     items: [
       {
-        ratio: '4 / 5',
-        src: 'moodboard/lovers-enemies.jpg',
-        alt: 'Tarjeta «Lovers to Enemies» sostenida por una mano con guante de encaje negro',
-      },
-      {
-        ratio: '2 / 3',
-        src: 'moodboard/puerta-roja.jpg',
-        alt: 'Figura encapuchada recortada contra un portal de luz roja',
-      },
-      {
-        ratio: '2 / 3',
-        src: 'moodboard/nosferatu.jpg',
-        alt: 'Cartel de Nosferatu: una mano pálida saliendo de un ataúd',
-      },
-      {
-        ratio: '1 / 1',
-        src: 'moodboard/murcielago.jpg',
-        alt: 'Murciélago negro grabado sobre papel rojo',
-      },
-      {
-        ratio: '2 / 3',
-        src: 'moodboard/retrato-murcielago.jpg',
-        alt: 'Retrato al óleo de una mujer de encaje blanco sosteniendo un murciélago',
+        ratio: '3 / 4',
+        src: 'moodboard/cortinas-fiesta.jpg',
+        alt: 'Fiesta de noche entre cortinas de terciopelo rojo',
       },
       {
         ratio: '3 / 4',
-        src: 'moodboard/corazon-espadas.jpg',
-        alt: 'Corazón rojo atravesado por tres espadas',
+        src: 'moodboard/devore-rosas.jpg',
+        alt: 'Tres mujeres de vestido largo en terciopelo devoré negro, con rosas rojas',
       },
       {
         ratio: '2 / 3',
-        src: 'moodboard/circe.jpg',
-        alt: 'Circe Invidiosa de Waterhouse, vertiendo una copa de líquido rojo',
-      },
-      {
-        ratio: '1 / 1',
-        src: 'moodboard/sobre-rojo.jpg',
-        alt: 'Invitación en sobre de terciopelo rojo sobre una charola de plata',
-      },
-      {
-        ratio: '2 / 3',
-        src: 'moodboard/niebla-cuernos.jpg',
-        alt: 'Silueta con cuernos entre niebla roja',
-      },
-      {
-        ratio: '2 / 3',
-        src: 'moodboard/catedral.jpg',
-        alt: 'Figura encapuchada bajo el arco tallado de una catedral, teñida de rojo',
+        src: 'moodboard/smokings.jpg',
+        alt: 'Dos hombres de smoking, uno en marfil y otro en terciopelo negro',
       },
       {
         ratio: '4 / 5',
-        src: 'moodboard/fuego.jpg',
-        alt: 'Mujer de vestido largo caminando hacia una pared de fuego',
+        src: 'moodboard/guantes-copa.jpg',
+        alt: 'Manos con guantes blancos y negros sirviendo una copa entre perlas',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/slip-guantes.jpg',
+        alt: 'Vestido slip negro con guantes largos de tul, en un pasillo de hotel',
+      },
+      {
+        ratio: '3 / 5',
+        src: 'moodboard/terciopelo-vino.jpg',
+        alt: 'Smoking de terciopelo vino con corbata de moño negra, sirviendo champaña',
       },
       {
         ratio: '2 / 3',
-        src: 'moodboard/invitacion.jpg',
-        alt: 'Invitación grabada en rojo y negro con un corazón atravesado por dagas',
+        src: 'moodboard/mantillas.jpg',
+        alt: 'Cuatro mujeres de encaje negro y mantilla, con bordados en oro viejo',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/sofa-rojo.jpg',
+        alt: 'Mujer de negro recostada en un sofá capitoné rojo con una copa en la mano',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/smoking-cortinas.jpg',
+        alt: 'Smoking negro cruzado ante un telón de terciopelo rojo y un candil',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/mesa-encaje.jpg',
+        alt: 'Mesa puesta a la luz de las velas, mantel vino y encaje negro',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/velos-perlas.jpg',
+        alt: 'Dos mujeres con velos sobre los ojos, perlas y labios oscuros',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/piel-verde.jpg',
+        alt: 'Terciopelo negro y piel verde esmeralda sobre un tapete persa',
       },
     ],
   },
