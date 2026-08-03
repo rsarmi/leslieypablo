@@ -4,172 +4,571 @@ import Seccion from './Seccion.astro';
 import Ornamento from './Ornamento.astro';
 
 const MAX_ACOMPANANTES = 5;
+
+/**
+ * La confirmación tiene cuatro pantallas dentro de la misma caja: buscar,
+ * confirmar, listo, y el formulario abierto de emergencia. Solo una está
+ * visible a la vez; las cambia `mostrarPaso()` en el script de abajo.
+ *
+ * El emparejado difuso de nombres corre en Apps Script, no aquí: así la lista
+ * completa de invitados nunca llega al navegador.
+ */
 ---
 
 <Seccion
   id="rsvp"
   eyebrow={`Antes del ${boda.fecha.limiteRsvp}`}
   titulo="Confirmar asistencia"
-  intro="Llenen un formulario por grupo. Si vienen acompañados, escriban también sus nombres para poder apartarles lugar."
+  intro={boda.rsvp.intro}
   ancho="normal"
 >
   <div class="revelar border-brass/25 bg-ink-2 border p-7 sm:p-11">
-    <form id="rsvp-form" novalidate>
-      <div class="space-y-7">
-        <div>
-          <label class="etiqueta" for="rsvp-nombre">Nombre completo *</label>
+    {/* ------------------------------------------------ 1. Buscador */}
+    <div id="paso-buscar">
+      <form id="buscar-form" novalidate>
+        <label class="etiqueta" for="buscar-input">Tu nombre</label>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
           <input
-            id="rsvp-nombre"
-            name="nombre"
+            id="buscar-input"
             type="text"
-            class="campo"
+            class="campo sm:flex-1"
             autocomplete="name"
-            placeholder="Nombre y apellidos"
-            required
-            maxlength="120"
+            autocapitalize="words"
+            autocorrect="off"
+            spellcheck="false"
+            placeholder="Nombre y apellido"
+            maxlength="80"
+            aria-describedby="buscar-ayuda"
           />
+          <button id="buscar-boton" type="submit" class="btn sm:w-40 sm:shrink-0">
+            Buscarme
+          </button>
         </div>
 
-        <div>
-          <label class="etiqueta" for="rsvp-contacto">Teléfono o correo *</label>
-          <input
-            id="rsvp-contacto"
-            name="contacto"
-            type="text"
-            class="campo"
-            autocomplete="tel"
-            inputmode="text"
-            placeholder="Para poder avisarles cualquier cambio"
-            required
-            maxlength="120"
-          />
-        </div>
-
-        <fieldset>
-          <legend class="etiqueta">¿Nos acompañan? *</legend>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <label class="opcion">
-              <input type="radio" name="asiste" value="si" class="sr-only" required checked />
-              <span class="opcion-caja">Ahí estaremos</span>
-            </label>
-            <label class="opcion">
-              <input type="radio" name="asiste" value="no" class="sr-only" />
-              <span class="opcion-caja">No podremos ir</span>
-            </label>
-          </div>
-        </fieldset>
-
-        {/* Todo lo que solo aplica si asisten */}
-        <div id="rsvp-si" class="space-y-7">
-          <div>
-            <label class="etiqueta" for="rsvp-acompanantes">¿Cuántas personas vienen contigo?</label>
-            <select id="rsvp-acompanantes" name="acompanantes" class="campo">
-              {
-                Array.from({ length: MAX_ACOMPANANTES + 1 }, (_, n) => (
-                  <option value={n}>
-                    {n === 0 ? 'Vengo solo / sola' : n === 1 ? '1 persona' : `${n} personas`}
-                  </option>
-                ))
-              }
-            </select>
-            <p class="text-ash mt-2 text-sm italic">
-              Sin contarte a ti. Si necesitan más lugares, díganlo en el mensaje y lo revisamos.
-            </p>
-          </div>
-
-          {/* Campos que aparecen según el número elegido */}
-          <div id="rsvp-nombres" class="hidden space-y-4">
-            <p class="etiqueta">Nombres de quienes vienen contigo</p>
-            {
-              Array.from({ length: MAX_ACOMPANANTES }, (_, i) => (
-                <input
-                  type="text"
-                  class="campo acompanante hidden"
-                  data-indice={i}
-                  placeholder={`Acompañante ${i + 1}`}
-                  aria-label={`Nombre del acompañante ${i + 1}`}
-                  maxlength="120"
-                />
-              ))
-            }
-          </div>
-
-          <div>
-            <label class="etiqueta" for="rsvp-cancion">Una canción que no puede faltar</label>
-            <input
-              id="rsvp-cancion"
-              name="cancion"
-              type="text"
-              class="campo"
-              placeholder="La que te va a sacar a bailar"
-              maxlength="200"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label class="etiqueta" for="rsvp-mensaje">Mensaje para nosotros</label>
-          <textarea
-            id="rsvp-mensaje"
-            name="mensaje"
-            class="campo resize-y"
-            rows="4"
-            placeholder="Restricciones alimenticias, alergias, o lo que quieran decirnos"
-            maxlength="1500"></textarea>
-        </div>
-      </div>
+        <p id="buscar-ayuda" class="text-ash mt-3 text-sm italic">
+          {boda.rsvp.ayudaBusqueda}
+        </p>
+      </form>
 
       <p
-        id="rsvp-error"
-        class="text-ember mt-6 min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
-        role="alert"
+        id="buscar-estado"
+        class="text-bone-dim mt-6 min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
+        role="status"
         aria-live="polite"
       >
       </p>
 
-      <button id="rsvp-boton" type="submit" class="btn mt-3 w-full"> Enviar respuesta </button>
-    </form>
+      {/* Los candidatos los pinta el script. */}
+      <ul id="buscar-resultados" class="hidden space-y-2.5"></ul>
 
-    {/* Confirmación: sustituye al formulario sin recargar */}
-    <div id="rsvp-exito" class="hidden py-8 text-center" role="status" aria-live="polite">
+      <p id="buscar-mas" class="text-ash mt-4 hidden text-sm italic"></p>
+
+      <div class="border-brass/15 mt-9 border-t pt-7 text-center">
+        <button id="abrir-plan-b" type="button" class="enlace-sobrio">
+          {boda.rsvp.enlacePlanB}
+        </button>
+      </div>
+    </div>
+
+    {/* ------------------------------------------------ 2. Confirmación */}
+    <div id="paso-confirmar" class="hidden">
+      <button id="confirmar-volver" type="button" class="enlace-sobrio mb-8">
+        ← Buscar otro nombre
+      </button>
+
+      <p class="etiqueta">Confirmando a</p>
+      <h3 id="confirmar-nombre" class="text-bone mb-2 text-3xl sm:text-4xl"></h3>
+
+      <p id="confirmar-previo" class="text-brass mt-3 hidden text-sm italic"></p>
+
+      <form id="confirmar-form" class="mt-8 space-y-7" novalidate>
+        <fieldset>
+          <legend class="etiqueta">¿Nos acompañas? *</legend>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <label class="opcion">
+              <input type="radio" name="confirmar-asiste" value="si" class="sr-only" checked />
+              <span class="opcion-caja">Ahí estaré</span>
+            </label>
+            <label class="opcion">
+              <input type="radio" name="confirmar-asiste" value="no" class="sr-only" />
+              <span class="opcion-caja">No podré ir</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div>
+          <label class="etiqueta" for="confirmar-contacto">Teléfono o correo *</label>
+          <input
+            id="confirmar-contacto"
+            type="text"
+            class="campo"
+            autocomplete="tel"
+            placeholder="Para poder avisarte cualquier cambio"
+            maxlength="120"
+          />
+        </div>
+
+        <p
+          id="confirmar-error"
+          class="text-ember min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
+          role="alert"
+          aria-live="polite"
+        >
+        </p>
+
+        <button id="confirmar-boton" type="submit" class="btn w-full">
+          Enviar mi respuesta
+        </button>
+      </form>
+    </div>
+
+    {/* ------------------------------------------------ 3. Listo */}
+    <div id="paso-exito" class="hidden py-8 text-center" role="status" aria-live="polite">
       <Ornamento tipo="corazon" class="text-acid mx-auto mb-7 h-16 w-16" />
       <h3 class="text-bone mb-4 text-3xl sm:text-4xl">Quedó registrado</h3>
-      <p id="rsvp-exito-texto" class="text-bone-dim mx-auto max-w-md text-lg"></p>
-      <button id="rsvp-otra" type="button" class="btn btn-ghost mt-9">
-        Registrar a alguien más
+      <p id="exito-texto" class="text-bone-dim mx-auto max-w-md text-lg"></p>
+      <button id="exito-otra" type="button" class="btn btn-ghost mt-9">
+        Confirmar a alguien más
       </button>
+    </div>
+
+    {/* ------------------------------------------------ 4. Plan B: formulario abierto */}
+    <div id="paso-abierto" class="hidden">
+      <button id="cerrar-plan-b" type="button" class="enlace-sobrio mb-8">
+        ← Volver a buscar mi nombre
+      </button>
+
+      <p class="text-bone-dim mb-8">{boda.rsvp.introPlanB}</p>
+
+      <form id="rsvp-form" novalidate>
+        <div class="space-y-7">
+          <div>
+            <label class="etiqueta" for="rsvp-nombre">Nombre completo *</label>
+            <input
+              id="rsvp-nombre"
+              name="nombre"
+              type="text"
+              class="campo"
+              autocomplete="name"
+              placeholder="Nombre y apellidos"
+              required
+              maxlength="120"
+            />
+          </div>
+
+          <div>
+            <label class="etiqueta" for="rsvp-contacto">Teléfono o correo *</label>
+            <input
+              id="rsvp-contacto"
+              name="contacto"
+              type="text"
+              class="campo"
+              autocomplete="tel"
+              placeholder="Para poder avisarles cualquier cambio"
+              required
+              maxlength="120"
+            />
+          </div>
+
+          <fieldset>
+            <legend class="etiqueta">¿Nos acompañan? *</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="opcion">
+                <input type="radio" name="asiste" value="si" class="sr-only" required checked />
+                <span class="opcion-caja">Ahí estaremos</span>
+              </label>
+              <label class="opcion">
+                <input type="radio" name="asiste" value="no" class="sr-only" />
+                <span class="opcion-caja">No podremos ir</span>
+              </label>
+            </div>
+          </fieldset>
+
+          {/* Todo lo que solo aplica si asisten */}
+          <div id="rsvp-si" class="space-y-7">
+            <div>
+              <label class="etiqueta" for="rsvp-acompanantes">
+                ¿Cuántas personas vienen contigo?
+              </label>
+              <select id="rsvp-acompanantes" name="acompanantes" class="campo">
+                {
+                  Array.from({ length: MAX_ACOMPANANTES + 1 }, (_, n) => (
+                    <option value={n}>
+                      {n === 0 ? 'Vengo solo / sola' : n === 1 ? '1 persona' : `${n} personas`}
+                    </option>
+                  ))
+                }
+              </select>
+              <p class="text-ash mt-2 text-sm italic">
+                Sin contarte a ti. Si necesitan más lugares, díganlo en el mensaje y lo revisamos.
+              </p>
+            </div>
+
+            {/* Campos que aparecen según el número elegido */}
+            <div id="rsvp-nombres" class="hidden space-y-4">
+              <p class="etiqueta">Nombres de quienes vienen contigo</p>
+              {
+                Array.from({ length: MAX_ACOMPANANTES }, (_, i) => (
+                  <input
+                    type="text"
+                    class="campo acompanante hidden"
+                    data-indice={i}
+                    placeholder={`Acompañante ${i + 1}`}
+                    aria-label={`Nombre del acompañante ${i + 1}`}
+                    maxlength="120"
+                  />
+                ))
+              }
+            </div>
+
+            <div>
+              <label class="etiqueta" for="rsvp-cancion">Una canción que no puede faltar</label>
+              <input
+                id="rsvp-cancion"
+                name="cancion"
+                type="text"
+                class="campo"
+                placeholder="La que te va a sacar a bailar"
+                maxlength="200"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="etiqueta" for="rsvp-mensaje">Mensaje para nosotros</label>
+            <textarea
+              id="rsvp-mensaje"
+              name="mensaje"
+              class="campo resize-y"
+              rows="4"
+              placeholder="Restricciones alimenticias, alergias, o lo que quieran decirnos"
+              maxlength="1500"></textarea>
+          </div>
+        </div>
+
+        <p
+          id="rsvp-error"
+          class="text-ember mt-6 min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
+          role="alert"
+          aria-live="polite"
+        >
+        </p>
+
+        <button id="rsvp-boton" type="submit" class="btn mt-3 w-full"> Enviar respuesta </button>
+      </form>
     </div>
   </div>
 </Seccion>
 
 <script>
-  import { enviarRsvp, type DatosRsvp } from '../lib/api';
+  import {
+    buscarInvitado,
+    confirmarInvitado,
+    enviarRsvp,
+    type DatosRsvp,
+    type InvitadoEncontrado,
+  } from '../lib/api';
 
-  const form = document.getElementById('rsvp-form') as HTMLFormElement;
-  const exito = document.getElementById('rsvp-exito') as HTMLElement;
-  const exitoTexto = document.getElementById('rsvp-exito-texto') as HTMLElement;
-  const boton = document.getElementById('rsvp-boton') as HTMLButtonElement;
-  const error = document.getElementById('rsvp-error') as HTMLElement;
-  const bloqueSi = document.getElementById('rsvp-si') as HTMLElement;
-  const bloqueNombres = document.getElementById('rsvp-nombres') as HTMLElement;
-  const selectAcompanantes = document.getElementById('rsvp-acompanantes') as HTMLSelectElement;
-  const botonOtra = document.getElementById('rsvp-otra') as HTMLButtonElement;
-
-  const inputNombre = document.getElementById('rsvp-nombre') as HTMLInputElement;
-  const inputContacto = document.getElementById('rsvp-contacto') as HTMLInputElement;
-  const inputCancion = document.getElementById('rsvp-cancion') as HTMLInputElement;
-  const inputMensaje = document.getElementById('rsvp-mensaje') as HTMLTextAreaElement;
-  const camposAcompanante = Array.from(
-    document.querySelectorAll<HTMLInputElement>('.acompanante')
-  );
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
   const MENSAJES: Record<string, string> = {
     password: 'Su sesión expiró. Recarguen la página',
     red: 'Sin conexión. Revisen su internet e inténtenlo otra vez',
-    servidor: 'No se pudo guardar. Inténtenlo en un momento',
+    servidor: 'Algo falló. Inténtenlo en un momento',
     sin_configurar: 'El formulario aún no está conectado',
-    campos_requeridos: 'Falta el nombre o el contacto',
+    campos_requeridos: 'Falta el teléfono o el correo',
+    consulta_corta: 'Escriban al menos tres letras',
+    fila_cambio: 'La lista cambió. Búsquense otra vez, por favor',
   };
+
+  // -------------------------------------------------------------------------
+  // Navegación entre pantallas
+  // -------------------------------------------------------------------------
+
+  const PASOS = ['buscar', 'confirmar', 'exito', 'abierto'] as const;
+  type Paso = (typeof PASOS)[number];
+
+  function mostrarPaso(paso: Paso) {
+    for (const nombre of PASOS) {
+      $(`paso-${nombre}`).classList.toggle('hidden', nombre !== paso);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 1. Buscador
+  // -------------------------------------------------------------------------
+
+  const entradaBusqueda = $<HTMLInputElement>('buscar-input');
+  const formBusqueda = $<HTMLFormElement>('buscar-form');
+  const botonBusqueda = $<HTMLButtonElement>('buscar-boton');
+  const estadoBusqueda = $('buscar-estado');
+  const listaResultados = $<HTMLUListElement>('buscar-resultados');
+  const avisoMas = $('buscar-mas');
+
+  const MINIMO = 3;
+  const ESPERA_MS = 550;
+
+  let temporizador: number | undefined;
+
+  /**
+   * Cada búsqueda lleva número. Como el usuario escribe más rápido de lo que
+   * responde Apps Script, una respuesta vieja puede llegar después de una
+   * nueva: si el número ya no es el último, se tira.
+   */
+  let secuencia = 0;
+
+  function limpiarResultados() {
+    listaResultados.replaceChildren();
+    listaResultados.classList.add('hidden');
+    avisoMas.classList.add('hidden');
+  }
+
+  function pintarEstado(texto: string) {
+    estadoBusqueda.textContent = texto;
+  }
+
+  function tarjetaResultado(invitado: InvitadoEncontrado): HTMLLIElement {
+    const li = document.createElement('li');
+
+    const boton = document.createElement('button');
+    boton.type = 'button';
+    boton.className = 'resultado';
+
+    const nombre = document.createElement('span');
+    // textContent y no innerHTML: el nombre viene de la hoja de cálculo.
+    nombre.textContent = invitado.nombre;
+    nombre.className = 'resultado-nombre';
+    boton.appendChild(nombre);
+
+    if (invitado.estado) {
+      const marca = document.createElement('span');
+      marca.className = 'resultado-marca';
+      marca.textContent = invitado.estado === 'Sí' ? 'Ya confirmó' : 'Respondió que no';
+      boton.appendChild(marca);
+    }
+
+    boton.addEventListener('click', () => abrirConfirmacion(invitado));
+    li.appendChild(boton);
+
+    return li;
+  }
+
+  async function lanzarBusqueda() {
+    window.clearTimeout(temporizador);
+
+    const consulta = entradaBusqueda.value.trim();
+
+    if (consulta.length < MINIMO) {
+      limpiarResultados();
+      pintarEstado(MENSAJES.consulta_corta);
+      return;
+    }
+
+    const mia = ++secuencia;
+    pintarEstado('Buscando…');
+    botonBusqueda.disabled = true;
+
+    const resultado = await buscarInvitado(consulta);
+
+    // Llegó tarde: ya hay una búsqueda más nueva en curso.
+    if (mia !== secuencia) return;
+
+    botonBusqueda.disabled = false;
+
+    if (!resultado.ok) {
+      limpiarResultados();
+      pintarEstado(MENSAJES[resultado.error] ?? MENSAJES.servidor);
+      return;
+    }
+
+    const { resultados, total } = resultado;
+
+    if (!resultados.length) {
+      limpiarResultados();
+      pintarEstado('No encontramos ese nombre');
+      avisoMas.textContent =
+        'Prueben con el apellido, o con menos palabras. Si aun así no aparece, usen el enlace de abajo y los agregamos a mano.';
+      avisoMas.classList.remove('hidden');
+      return;
+    }
+
+    pintarEstado(resultados.length === 1 ? '1 coincidencia' : `${resultados.length} coincidencias`);
+
+    listaResultados.replaceChildren(...resultados.map(tarjetaResultado));
+    listaResultados.classList.remove('hidden');
+
+    // Cuando hay más de los que caben, la salida es afinar la búsqueda.
+    if (total > resultados.length) {
+      avisoMas.textContent = `Hay ${total} parecidos. Agreguen su apellido para acortar la lista.`;
+      avisoMas.classList.remove('hidden');
+    } else {
+      avisoMas.classList.add('hidden');
+    }
+  }
+
+  formBusqueda.addEventListener('submit', (e) => {
+    e.preventDefault();
+    void lanzarBusqueda();
+  });
+
+  // Búsqueda mientras escriben, pero sin castigar cada tecla.
+  entradaBusqueda.addEventListener('input', () => {
+    window.clearTimeout(temporizador);
+
+    if (entradaBusqueda.value.trim().length < MINIMO) {
+      secuencia++; // invalida cualquier respuesta en vuelo
+      limpiarResultados();
+      pintarEstado('');
+      return;
+    }
+
+    temporizador = window.setTimeout(() => void lanzarBusqueda(), ESPERA_MS);
+  });
+
+  // -------------------------------------------------------------------------
+  // 2. Confirmación
+  // -------------------------------------------------------------------------
+
+  const formConfirmar = $<HTMLFormElement>('confirmar-form');
+  const nombreConfirmar = $('confirmar-nombre');
+  const previoConfirmar = $('confirmar-previo');
+  const contactoConfirmar = $<HTMLInputElement>('confirmar-contacto');
+  const errorConfirmar = $('confirmar-error');
+  const botonConfirmar = $<HTMLButtonElement>('confirmar-boton');
+
+  let elegido: InvitadoEncontrado | null = null;
+
+  function radioAsiste(): HTMLInputElement | null {
+    return formConfirmar.querySelector('input[name="confirmar-asiste"]:checked');
+  }
+
+  function abrirConfirmacion(invitado: InvitadoEncontrado) {
+    elegido = invitado;
+
+    nombreConfirmar.textContent = invitado.nombre;
+    errorConfirmar.textContent = '';
+    contactoConfirmar.value = '';
+    contactoConfirmar.setAttribute('aria-invalid', 'false');
+
+    // Quien ya respondió antes ve su respuesta anterior y puede cambiarla.
+    if (invitado.estado) {
+      previoConfirmar.textContent = `Ya habías respondido «${invitado.estado}». Puedes cambiarlo aquí.`;
+      previoConfirmar.classList.remove('hidden');
+    } else {
+      previoConfirmar.classList.add('hidden');
+    }
+
+    const valor = invitado.estado === 'No' ? 'no' : 'si';
+    const radio = formConfirmar.querySelector<HTMLInputElement>(
+      `input[name="confirmar-asiste"][value="${valor}"]`
+    );
+    if (radio) radio.checked = true;
+
+    mostrarPaso('confirmar');
+    contactoConfirmar.focus();
+  }
+
+  formConfirmar.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!elegido) return;
+
+    errorConfirmar.textContent = '';
+
+    const contacto = contactoConfirmar.value.trim();
+    if (!contacto) {
+      contactoConfirmar.setAttribute('aria-invalid', 'true');
+      contactoConfirmar.focus();
+      errorConfirmar.textContent = MENSAJES.campos_requeridos;
+      return;
+    }
+    contactoConfirmar.setAttribute('aria-invalid', 'false');
+
+    const viene = radioAsiste()?.value === 'si';
+
+    botonConfirmar.disabled = true;
+    botonConfirmar.textContent = 'Enviando…';
+
+    const resultado = await confirmarInvitado({
+      fila: elegido.fila,
+      nombre: elegido.nombre,
+      asiste: viene ? 'si' : 'no',
+      contacto,
+    });
+
+    botonConfirmar.disabled = false;
+    botonConfirmar.textContent = 'Enviar mi respuesta';
+
+    if (!resultado.ok) {
+      errorConfirmar.textContent = MENSAJES[resultado.error] ?? MENSAJES.servidor;
+
+      // Si movieron filas en la hoja, el número que traíamos ya no sirve:
+      // hay que volver a buscar para conseguir uno bueno.
+      if (resultado.error === 'fila_cambio') {
+        pintarEstado(MENSAJES.fila_cambio);
+        limpiarResultados();
+        mostrarPaso('buscar');
+        entradaBusqueda.focus();
+      }
+      return;
+    }
+
+    const nombreCorto = elegido.nombre.split(/\s+/)[0];
+    $('exito-texto').textContent = viene
+      ? `Te esperamos, ${nombreCorto}. Nos vemos el 31 de octubre.`
+      : 'Gracias por avisarnos. Te vamos a extrañar esa noche.';
+
+    mostrarPaso('exito');
+    $('paso-exito').scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+
+  $('confirmar-volver').addEventListener('click', () => {
+    mostrarPaso('buscar');
+    entradaBusqueda.focus();
+    entradaBusqueda.select();
+  });
+
+  // -------------------------------------------------------------------------
+  // 3. Volver a empezar
+  // -------------------------------------------------------------------------
+
+  $('exito-otra').addEventListener('click', () => {
+    elegido = null;
+    entradaBusqueda.value = '';
+    limpiarResultados();
+    pintarEstado('');
+    mostrarPaso('buscar');
+    entradaBusqueda.focus();
+  });
+
+  // -------------------------------------------------------------------------
+  // 4. Plan B: el formulario abierto de siempre
+  // -------------------------------------------------------------------------
+
+  $('abrir-plan-b').addEventListener('click', () => {
+    mostrarPaso('abierto');
+    $('rsvp-nombre').focus();
+  });
+
+  $('cerrar-plan-b').addEventListener('click', () => {
+    mostrarPaso('buscar');
+    entradaBusqueda.focus();
+  });
+
+  const form = $<HTMLFormElement>('rsvp-form');
+  const boton = $<HTMLButtonElement>('rsvp-boton');
+  const error = $('rsvp-error');
+  const bloqueSi = $('rsvp-si');
+  const bloqueNombres = $('rsvp-nombres');
+  const selectAcompanantes = $<HTMLSelectElement>('rsvp-acompanantes');
+
+  const inputNombre = $<HTMLInputElement>('rsvp-nombre');
+  const inputContacto = $<HTMLInputElement>('rsvp-contacto');
+  const inputCancion = $<HTMLInputElement>('rsvp-cancion');
+  const inputMensaje = $<HTMLTextAreaElement>('rsvp-mensaje');
+  const camposAcompanante = Array.from(
+    document.querySelectorAll<HTMLInputElement>('.acompanante')
+  );
 
   function asiste(): boolean {
     return (form.querySelector('input[name="asiste"]:checked') as HTMLInputElement)?.value === 'si';
@@ -200,13 +599,9 @@ const MAX_ACOMPANANTES = 5;
 
   selectAcompanantes.addEventListener('change', sincronizarAcompanantes);
 
-  function pintarError(codigo: string | null) {
-    error.textContent = codigo ? (MENSAJES[codigo] ?? MENSAJES.servidor) : '';
-  }
-
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    pintarError(null);
+    error.textContent = '';
 
     const nombre = inputNombre.value.trim();
     const contacto = inputContacto.value.trim();
@@ -219,7 +614,7 @@ const MAX_ACOMPANANTES = 5;
       if (!valor) {
         campo.setAttribute('aria-invalid', 'true');
         campo.focus();
-        pintarError('campos_requeridos');
+        error.textContent = 'Falta el nombre o el contacto';
         return;
       }
       campo.setAttribute('aria-invalid', 'false');
@@ -247,29 +642,20 @@ const MAX_ACOMPANANTES = 5;
     boton.textContent = 'Enviar respuesta';
 
     if (!resultado.ok) {
-      pintarError(resultado.error);
+      error.textContent = MENSAJES[resultado.error] ?? MENSAJES.servidor;
       return;
     }
 
-    exitoTexto.textContent = viene
+    $('exito-texto').textContent = viene
       ? cantidad > 0
         ? `Los esperamos a ustedes ${cantidad + 1}. Nos vemos el 31 de octubre.`
         : 'Te esperamos el 31 de octubre.'
       : 'Gracias por avisarnos. Los vamos a extrañar esa noche.';
 
-    form.classList.add('hidden');
-    exito.classList.remove('hidden');
-    exito.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  });
-
-  // Permite confirmar a varias personas seguidas desde el mismo dispositivo.
-  botonOtra.addEventListener('click', () => {
     form.reset();
     sincronizarAsistencia();
-    pintarError(null);
-    exito.classList.add('hidden');
-    form.classList.remove('hidden');
-    inputNombre.focus();
+    mostrarPaso('exito');
+    $('paso-exito').scrollIntoView({ block: 'center', behavior: 'smooth' });
   });
 
   sincronizarAsistencia();
@@ -313,5 +699,79 @@ const MAX_ACOMPANANTES = 5;
   .opcion input:focus-visible + .opcion-caja {
     outline: 2px solid var(--color-brass);
     outline-offset: 3px;
+  }
+
+  /*
+   * Los candidatos los crea el script en tiempo de ejecución, así que nunca
+   * reciben el atributo de scope que Astro le pone al marcado del template y
+   * un selector normal no los alcanzaría. Se anclan a #buscar-resultados —que
+   * sí está en el template y sí lleva el scope— y de ahí para dentro se marcan
+   * como globales.
+   */
+  #buscar-resultados :global(.resultado) {
+    display: flex;
+    width: 100%;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1.15rem;
+    cursor: pointer;
+    text-align: left;
+    background-color: var(--color-ink);
+    border: 1px solid color-mix(in srgb, var(--color-brass) 22%, transparent);
+    transition:
+      background-color 0.3s var(--ease-vela),
+      border-color 0.3s var(--ease-vela);
+  }
+
+  #buscar-resultados :global(.resultado:hover),
+  #buscar-resultados :global(.resultado:focus-visible) {
+    background-color: var(--color-oxblood);
+    border-color: var(--color-brass);
+  }
+
+  #buscar-resultados :global(.resultado-nombre) {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    color: var(--color-bone);
+  }
+
+  #buscar-resultados :global(.resultado-marca) {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-brass);
+  }
+
+  /*
+   * En pantallas angostas la marca y el nombre no caben en el mismo renglón y
+   * el nombre se partía a media palabra. Se apilan.
+   */
+  @media (max-width: 30rem) {
+    #buscar-resultados :global(.resultado) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.3rem;
+    }
+  }
+
+  /* Enlaces de navegación entre pantallas: texto, no botón. */
+  .enlace-sobrio {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-underline-offset: 5px;
+    text-decoration-color: color-mix(in srgb, var(--color-brass) 40%, transparent);
+    transition: color 0.3s var(--ease-vela);
+  }
+
+  .enlace-sobrio:hover {
+    color: var(--color-bone);
   }
 </style>

@@ -59,6 +59,17 @@ export const boda = {
     nota: 'Cae el 31 de octubre, así que la idea va más por la elegancia oscura que por el disfraz.',
   },
 
+  rsvp: {
+    intro:
+      'Busca tu nombre en la lista y dinos si nos acompañas. Es una confirmación por persona, así que cada quien tiene que buscarse.',
+    ayudaBusqueda:
+      'Escríbelo como salga: aunque le falte un acento o se te vaya un dedo, te encontramos.',
+    /** Texto del enlace que abre el formulario abierto (el plan B). */
+    enlacePlanB: 'No me encuentro en la lista',
+    introPlanB:
+      'Escríbenos aquí y nosotros te agregamos a mano. Si vienen varios, con un formulario por grupo basta.',
+  },
+
   regalos: {
     intro:
       'Su presencia es el regalo, pero si además quieren apoyarnos para nuestro viaje de luna de miel a las Islas de Pascua, la forma más útil para nosotros es una transferencia.',

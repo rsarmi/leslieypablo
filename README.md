@@ -100,11 +100,70 @@ Si no, la URL sigue sirviendo el código viejo. Es el error más común.
 
 ### Pestañas
 
-| Pestaña      | Para qué                                                              |
-| ------------ | --------------------------------------------------------------------- |
-| `Invitados`  | La lista de trabajo de ustedes. **El sitio no la lee ni la escribe.**  |
-| `Config`     | `password` y datos bancarios. Cambiarlos aquí surte efecto al instante. |
-| `Respuestas` | Una fila por cada RSVP enviado.                                        |
+| Pestaña      | Para qué                                                                     |
+| ------------ | ---------------------------------------------------------------------------- |
+| `Invitados`  | La lista. El sitio la **lee** para el buscador y escribe **solo** en las tres columnas que agrega al final. |
+| `Config`     | `password` y datos bancarios. Cambiarlos aquí surte efecto al instante.       |
+| `Respuestas` | Una fila por cada envío del formulario abierto (el plan B).                   |
+
+---
+
+## Confirmación: el buscador de invitados
+
+El invitado escribe su nombre, el sitio lo busca en la columna `Nombre` de
+`Invitados` y le muestra los candidatos parecidos. Elige el suyo, dice si viene
+y deja un teléfono o correo. **Una confirmación por lugar**: cada persona se
+busca a sí misma.
+
+### Las tres columnas que escribe el sitio
+
+Se crean solas la primera vez, al final de `Invitados`, después de todo lo que
+ya haya:
+
+| Columna              | Qué guarda                        |
+| -------------------- | --------------------------------- |
+| `Confirmó web`       | `Sí` o `No`                       |
+| `Fecha confirmación` | Cuándo respondió                  |
+| `Contacto web`       | El teléfono o correo que dejaron  |
+
+**La columna `Confirmado` no se toca nunca.** Es la de trabajo de ustedes y el
+sitio no la lee ni la escribe, así que lo que marquen a mano ahí no se pierde
+ni lo pisa nadie. Comparar las dos columnas dice quién se confirmó solo y a
+quién marcaron ustedes.
+
+Las columnas se buscan **por nombre de encabezado**, no por posición: pueden
+insertar, mover o reordenar columnas en `Invitados` sin romper nada. Lo único
+que no hay que hacer es renombrar esos tres encabezados.
+
+### Tolerancia a errores
+
+El emparejado corre en el servidor —la lista completa nunca llega al
+navegador— y compara en dos capas: distancia de edición sobre el nombre sin
+acentos, y una clave fonética para español. En pruebas contra la lista real,
+el nombre correcto aparece entre los candidatos en el **100 %** de los casos
+con una letra de más, una de menos, dos intercambiadas, sin acentos o sin
+mayúsculas, y en el primer lugar el 98 % de las veces.
+
+Encuentra cosas como:
+
+| Escriben              | Encuentran           |
+| --------------------- | -------------------- |
+| `elvira miller`       | Elvira Müller        |
+| `Gutierres`           | Rodrigo Gutiérrez    |
+| `pedro senal`         | Pedro Ceñal          |
+| `kristina makgregor`  | Cristina MacGregor   |
+| `juanarreola`         | Juan Arreola         |
+
+Para calibrarlo sin desplegar el sitio, corran `probarBuscador()` desde el
+editor de Apps Script: escribe en el log qué encuentra para una batería de
+consultas típicas. El umbral está en la constante `UMBRAL` de `Codigo.gs`.
+
+### Quien no se encuentra
+
+Hoy hay filas de la lista con solo un nombre de pila, y esas no son
+distinguibles entre sí. Por eso la pantalla tiene abajo un enlace de
+**«No me encuentro en la lista»** que abre el formulario abierto de siempre;
+esos envíos caen en `Respuestas` y se reconcilian a mano.
 
 Cambiar la contraseña en `Config` **no requiere redesplegar el sitio**. Los
 invitados que ya habían entrado tendrán que escribirla de nuevo.

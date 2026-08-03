@@ -26,13 +26,42 @@ export interface DatosBanco {
   nota: string;
 }
 
-export type ErrorApi = 'password' | 'red' | 'servidor' | 'sin_configurar' | 'campos_requeridos';
+export type ErrorApi =
+  | 'password'
+  | 'red'
+  | 'servidor'
+  | 'sin_configurar'
+  | 'campos_requeridos'
+  /** La búsqueda necesita al menos tres letras. */
+  | 'consulta_corta'
+  /** Movieron filas en la hoja entre la búsqueda y la confirmación. */
+  | 'fila_cambio';
 
 export type ResultadoUnlock =
   | { ok: true; banco: DatosBanco }
   | { ok: false; error: ErrorApi };
 
 export type ResultadoRsvp = { ok: true } | { ok: false; error: ErrorApi };
+
+/** Una fila de la pestaña `Invitados` que se parece a lo que buscaron. */
+export interface InvitadoEncontrado {
+  /** Fila real en la hoja. Es el identificador: el `N°` viene repetido. */
+  fila: number;
+  nombre: string;
+  /** 'Sí' | 'No' | '' según lo que ya haya respondido esa persona en el sitio. */
+  estado: string;
+}
+
+export type ResultadoBusqueda =
+  | { ok: true; resultados: InvitadoEncontrado[]; total: number }
+  | { ok: false; error: ErrorApi };
+
+export interface DatosConfirmacion {
+  fila: number;
+  nombre: string;
+  asiste: 'si' | 'no';
+  contacto: string;
+}
 
 export interface DatosRsvp {
   nombre: string;
@@ -127,6 +156,62 @@ export async function unlock(password: string): Promise<ResultadoUnlock> {
     if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
     return { ok: false, error: 'red' };
   }
+}
+
+/**
+ * Busca al invitado en la lista. El emparejado difuso corre en el servidor a
+ * propósito: así la lista completa de invitados nunca llega al navegador y
+ * siempre se consulta la versión más reciente de la hoja, que los novios
+ * siguen editando.
+ */
+export async function buscarInvitado(consulta: string): Promise<ResultadoBusqueda> {
+  const password = leerPassword();
+  if (!password) return { ok: false, error: 'password' };
+
+  try {
+    const respuesta = await postear({ action: 'buscar', password, consulta });
+
+    if (respuesta?.ok) {
+      return {
+        ok: true,
+        resultados: (respuesta.resultados ?? []) as InvitadoEncontrado[],
+        total: Number(respuesta.total ?? 0),
+      };
+    }
+
+    return { ok: false, error: codigoConocido(respuesta?.error) };
+  } catch (err) {
+    if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
+    return { ok: false, error: 'red' };
+  }
+}
+
+/** Marca la fila del invitado con su respuesta. */
+export async function confirmarInvitado(datos: DatosConfirmacion): Promise<ResultadoRsvp> {
+  const password = leerPassword();
+  if (!password) return { ok: false, error: 'password' };
+
+  try {
+    const respuesta = await postear({ action: 'confirmar', password, ...datos });
+
+    if (respuesta?.ok) return { ok: true };
+    return { ok: false, error: codigoConocido(respuesta?.error) };
+  } catch (err) {
+    if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
+    return { ok: false, error: 'red' };
+  }
+}
+
+/** Los errores del servidor que el cliente sabe explicar; el resto es 'servidor'. */
+const CODIGOS: ReadonlySet<string> = new Set([
+  'password',
+  'campos_requeridos',
+  'consulta_corta',
+  'fila_cambio',
+]);
+
+function codigoConocido(error: unknown): ErrorApi {
+  return typeof error === 'string' && CODIGOS.has(error) ? (error as ErrorApi) : 'servidor';
 }
 
 export async function enviarRsvp(datos: DatosRsvp): Promise<ResultadoRsvp> {
