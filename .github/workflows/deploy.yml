@@ -32,12 +32,12 @@ jobs:
 
       - run: npm run build
 
-      # enablement: true activa GitHub Pages en el repo la primera vez. Sin
-      # esto el workflow falla con "Get Pages site failed" hasta que alguien
-      # entre a Settings → Pages a mano.
+      # OJO: esto falla con "Get Pages site failed" hasta que alguien active
+      # Pages a mano en Settings → Pages → Source: GitHub Actions. El
+      # GITHUB_TOKEN por defecto no tiene permiso para crear el sitio
+      # (`enablement: true` devuelve "Resource not accessible by integration"),
+      # así que ese primer paso es manual y no se puede automatizar desde aquí.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -5,17 +5,29 @@ import { ruta } from '../lib/rutas';
 
 <section
   id="inicio"
-  class="vineta relative flex min-h-[100svh] flex-col items-center justify-center gap-12 py-16 sm:gap-16"
+  class="vineta relative flex min-h-[100svh] flex-col items-center justify-center gap-8 py-12 sm:gap-16 sm:py-16"
 >
   {/*
     Banda de tres fotos a todo lo ancho, sin recortes raros: rectángulos
     horizontales del mismo alto separados por un filo de latón. Las fotos ya
     vienen en la paleta (luz roja, grano de película), así que no llevan filtro.
   */}
-  <div class="bg-brass/30 revelar relative grid w-full grid-cols-3 gap-px">
+  {/*
+    order-2 en móvil: apiladas ocupan más de una pantalla, así que si van
+    primero lo único que se ve al abrir son las fotos y los nombres quedan
+    bajo el pliegue. De 640px para arriba caben en fila y vuelven arriba.
+  */}
+  <div
+    class="bg-brass/30 revelar relative order-2 grid w-full grid-cols-1 gap-px sm:order-1 sm:grid-cols-3"
+  >
     {
       boda.portada.map((foto, i) => (
-        <figure class="bg-ink-2 relative overflow-hidden" style="aspect-ratio:3 / 2">
+        /*
+         * Apiladas en móvil. En vertical se recortan a franja ancha (16:9)
+         * para que las tres juntas no empujen los nombres fuera de pantalla;
+         * de 640px para arriba vuelven a la fila de tres en 3:2.
+         */
+        <figure class="bg-ink-2 relative aspect-[16/9] overflow-hidden sm:aspect-[3/2]">
           <img
             src={ruta(foto.src)}
             alt={foto.alt}
@@ -31,7 +43,7 @@ import { ruta } from '../lib/rutas';
     }
   </div>
 
-  <div class="relative w-full max-w-3xl px-5 text-center">
+  <div class="relative order-1 w-full max-w-3xl px-5 text-center sm:order-2">
     <h1 class="revelar text-bone text-[clamp(2.5rem,11vw,6rem)]">
       <span class="block">{boda.novios.ella}</span>
       <span
