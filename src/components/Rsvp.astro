@@ -3,8 +3,6 @@ import { boda } from '../config/boda';
 import Seccion from './Seccion.astro';
 import Ornamento from './Ornamento.astro';
 
-const MAX_ACOMPANANTES = 5;
-
 /**
  * La confirmación tiene cuatro pantallas dentro de la misma caja: buscar,
  * confirmar, listo, y el formulario abierto de emergencia. Solo una está
@@ -39,16 +37,11 @@ const MAX_ACOMPANANTES = 5;
             spellcheck="false"
             placeholder="Nombre y apellido"
             maxlength="80"
-            aria-describedby="buscar-ayuda"
           />
           <button id="buscar-boton" type="submit" class="btn sm:w-40 sm:shrink-0">
             Buscarme
           </button>
         </div>
-
-        <p id="buscar-ayuda" class="text-ash mt-3 text-sm italic">
-          {boda.rsvp.ayudaBusqueda}
-        </p>
       </form>
 
       <p
@@ -80,8 +73,6 @@ const MAX_ACOMPANANTES = 5;
       <p class="etiqueta">Confirmando a</p>
       <h3 id="confirmar-nombre" class="text-bone mb-2 text-3xl sm:text-4xl"></h3>
 
-      <p id="confirmar-previo" class="text-brass mt-3 hidden text-sm italic"></p>
-
       <form id="confirmar-form" class="mt-8 space-y-7" novalidate>
         <fieldset>
           <legend class="etiqueta">¿Nos acompañas? *</legend>
@@ -98,14 +89,30 @@ const MAX_ACOMPANANTES = 5;
         </fieldset>
 
         <div>
-          <label class="etiqueta" for="confirmar-contacto">Teléfono o correo *</label>
+          <label class="etiqueta" for="confirmar-mail">Correo *</label>
           <input
-            id="confirmar-contacto"
-            type="text"
+            id="confirmar-mail"
+            type="email"
+            class="campo"
+            autocomplete="email"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            placeholder="tu@correo.com"
+            maxlength="120"
+          />
+        </div>
+
+        <div>
+          <label class="etiqueta" for="confirmar-telefono">Teléfono *</label>
+          <input
+            id="confirmar-telefono"
+            type="tel"
             class="campo"
             autocomplete="tel"
-            placeholder="Para poder avisarte cualquier cambio"
-            maxlength="120"
+            inputmode="tel"
+            placeholder="Con WhatsApp, para avisarte cualquier cambio"
+            maxlength="60"
           />
         </div>
 
@@ -172,67 +179,30 @@ const MAX_ACOMPANANTES = 5;
           </div>
 
           <fieldset>
-            <legend class="etiqueta">¿Nos acompañan? *</legend>
+            <legend class="etiqueta">¿Nos acompañas? *</legend>
             <div class="grid gap-3 sm:grid-cols-2">
               <label class="opcion">
                 <input type="radio" name="asiste" value="si" class="sr-only" required checked />
-                <span class="opcion-caja">Ahí estaremos</span>
+                <span class="opcion-caja">Ahí estaré</span>
               </label>
               <label class="opcion">
                 <input type="radio" name="asiste" value="no" class="sr-only" />
-                <span class="opcion-caja">No podremos ir</span>
+                <span class="opcion-caja">No podré ir</span>
               </label>
             </div>
           </fieldset>
 
-          {/* Todo lo que solo aplica si asisten */}
-          <div id="rsvp-si" class="space-y-7">
-            <div>
-              <label class="etiqueta" for="rsvp-acompanantes">
-                ¿Cuántas personas vienen contigo?
-              </label>
-              <select id="rsvp-acompanantes" name="acompanantes" class="campo">
-                {
-                  Array.from({ length: MAX_ACOMPANANTES + 1 }, (_, n) => (
-                    <option value={n}>
-                      {n === 0 ? 'Vengo solo / sola' : n === 1 ? '1 persona' : `${n} personas`}
-                    </option>
-                  ))
-                }
-              </select>
-              <p class="text-ash mt-2 text-sm italic">
-                Sin contarte a ti. Si necesitan más lugares, díganlo en el mensaje y lo revisamos.
-              </p>
-            </div>
-
-            {/* Campos que aparecen según el número elegido */}
-            <div id="rsvp-nombres" class="hidden space-y-4">
-              <p class="etiqueta">Nombres de quienes vienen contigo</p>
-              {
-                Array.from({ length: MAX_ACOMPANANTES }, (_, i) => (
-                  <input
-                    type="text"
-                    class="campo acompanante hidden"
-                    data-indice={i}
-                    placeholder={`Acompañante ${i + 1}`}
-                    aria-label={`Nombre del acompañante ${i + 1}`}
-                    maxlength="120"
-                  />
-                ))
-              }
-            </div>
-
-            <div>
-              <label class="etiqueta" for="rsvp-cancion">Una canción que no puede faltar</label>
-              <input
-                id="rsvp-cancion"
-                name="cancion"
-                type="text"
-                class="campo"
-                placeholder="La que te va a sacar a bailar"
-                maxlength="200"
-              />
-            </div>
+          {/* Solo tiene sentido si asisten */}
+          <div id="rsvp-si">
+            <label class="etiqueta" for="rsvp-cancion">Una canción que no puede faltar</label>
+            <input
+              id="rsvp-cancion"
+              name="cancion"
+              type="text"
+              class="campo"
+              placeholder="La que te va a sacar a bailar"
+              maxlength="200"
+            />
           </div>
 
           <div>
@@ -277,9 +247,11 @@ const MAX_ACOMPANANTES = 5;
     red: 'Sin conexión. Revisen su internet e inténtenlo otra vez',
     servidor: 'Algo falló. Inténtenlo en un momento',
     sin_configurar: 'El formulario aún no está conectado',
-    campos_requeridos: 'Falta el teléfono o el correo',
+    campos_requeridos: 'Faltan el correo o el teléfono',
     consulta_corta: 'Escriban al menos tres letras',
     fila_cambio: 'La lista cambió. Búsquense otra vez, por favor',
+    mail_invalido: 'Ese correo no se ve bien. Revísenlo',
+    telefono_invalido: 'Ese teléfono no se ve bien. Revísenlo',
   };
 
   // -------------------------------------------------------------------------
@@ -307,14 +279,11 @@ const MAX_ACOMPANANTES = 5;
   const avisoMas = $('buscar-mas');
 
   const MINIMO = 3;
-  const ESPERA_MS = 550;
-
-  let temporizador: number | undefined;
 
   /**
-   * Cada búsqueda lleva número. Como el usuario escribe más rápido de lo que
-   * responde Apps Script, una respuesta vieja puede llegar después de una
-   * nueva: si el número ya no es el último, se tira.
+   * Cada búsqueda lleva número. Si alguien le da a «Buscarme» dos veces
+   * seguidas, la respuesta de la primera puede llegar después de la segunda:
+   * si el número ya no es el último, se tira.
    */
   let secuencia = 0;
 
@@ -341,13 +310,6 @@ const MAX_ACOMPANANTES = 5;
     nombre.className = 'resultado-nombre';
     boton.appendChild(nombre);
 
-    if (invitado.estado) {
-      const marca = document.createElement('span');
-      marca.className = 'resultado-marca';
-      marca.textContent = invitado.estado === 'Sí' ? 'Ya confirmó' : 'Respondió que no';
-      boton.appendChild(marca);
-    }
-
     boton.addEventListener('click', () => abrirConfirmacion(invitado));
     li.appendChild(boton);
 
@@ -355,8 +317,6 @@ const MAX_ACOMPANANTES = 5;
   }
 
   async function lanzarBusqueda() {
-    window.clearTimeout(temporizador);
-
     const consulta = entradaBusqueda.value.trim();
 
     if (consulta.length < MINIMO) {
@@ -407,23 +367,23 @@ const MAX_ACOMPANANTES = 5;
     }
   }
 
+  /*
+   * La búsqueda sale solo al dar «Buscarme» (o Enter), no mientras escriben:
+   * cada consulta es un viaje a Apps Script de un par de segundos, y buscar a
+   * medio nombre devuelve candidatos que se van cambiando debajo del cursor.
+   */
   formBusqueda.addEventListener('submit', (e) => {
     e.preventDefault();
     void lanzarBusqueda();
   });
 
-  // Búsqueda mientras escriben, pero sin castigar cada tecla.
+  // Al reescribir, los resultados anteriores ya no corresponden.
   entradaBusqueda.addEventListener('input', () => {
-    window.clearTimeout(temporizador);
-
-    if (entradaBusqueda.value.trim().length < MINIMO) {
+    if (!listaResultados.classList.contains('hidden') || estadoBusqueda.textContent) {
       secuencia++; // invalida cualquier respuesta en vuelo
       limpiarResultados();
       pintarEstado('');
-      return;
     }
-
-    temporizador = window.setTimeout(() => void lanzarBusqueda(), ESPERA_MS);
   });
 
   // -------------------------------------------------------------------------
@@ -432,8 +392,8 @@ const MAX_ACOMPANANTES = 5;
 
   const formConfirmar = $<HTMLFormElement>('confirmar-form');
   const nombreConfirmar = $('confirmar-nombre');
-  const previoConfirmar = $('confirmar-previo');
-  const contactoConfirmar = $<HTMLInputElement>('confirmar-contacto');
+  const mailConfirmar = $<HTMLInputElement>('confirmar-mail');
+  const telefonoConfirmar = $<HTMLInputElement>('confirmar-telefono');
   const errorConfirmar = $('confirmar-error');
   const botonConfirmar = $<HTMLButtonElement>('confirmar-boton');
 
@@ -448,25 +408,20 @@ const MAX_ACOMPANANTES = 5;
 
     nombreConfirmar.textContent = invitado.nombre;
     errorConfirmar.textContent = '';
-    contactoConfirmar.value = '';
-    contactoConfirmar.setAttribute('aria-invalid', 'false');
 
-    // Quien ya respondió antes ve su respuesta anterior y puede cambiarla.
-    if (invitado.estado) {
-      previoConfirmar.textContent = `Ya habías respondido «${invitado.estado}». Puedes cambiarlo aquí.`;
-      previoConfirmar.classList.remove('hidden');
-    } else {
-      previoConfirmar.classList.add('hidden');
+    for (const campo of [mailConfirmar, telefonoConfirmar]) {
+      campo.value = '';
+      campo.setAttribute('aria-invalid', 'false');
     }
 
-    const valor = invitado.estado === 'No' ? 'no' : 'si';
+    // Siempre se arranca en «Ahí estaré»: no se muestra qué respondió antes.
     const radio = formConfirmar.querySelector<HTMLInputElement>(
-      `input[name="confirmar-asiste"][value="${valor}"]`
+      'input[name="confirmar-asiste"][value="si"]'
     );
     if (radio) radio.checked = true;
 
     mostrarPaso('confirmar');
-    contactoConfirmar.focus();
+    mailConfirmar.focus();
   }
 
   formConfirmar.addEventListener('submit', async (e) => {
@@ -475,14 +430,27 @@ const MAX_ACOMPANANTES = 5;
 
     errorConfirmar.textContent = '';
 
-    const contacto = contactoConfirmar.value.trim();
-    if (!contacto) {
-      contactoConfirmar.setAttribute('aria-invalid', 'true');
-      contactoConfirmar.focus();
-      errorConfirmar.textContent = MENSAJES.campos_requeridos;
+    const mail = mailConfirmar.value.trim();
+    const telefono = telefonoConfirmar.value.trim();
+
+    // Se valida aquí lo mismo que valida el servidor, para no gastar un viaje.
+    const problemas: [HTMLInputElement, boolean, string][] = [
+      [mailConfirmar, !mail, 'campos_requeridos'],
+      [mailConfirmar, mail.indexOf('@') < 1 || !mail.includes('.'), 'mail_invalido'],
+      [telefonoConfirmar, !telefono, 'campos_requeridos'],
+      [telefonoConfirmar, telefono.replace(/\D/g, '').length < 8, 'telefono_invalido'],
+    ];
+
+    mailConfirmar.setAttribute('aria-invalid', 'false');
+    telefonoConfirmar.setAttribute('aria-invalid', 'false');
+
+    for (const [campo, falla, codigo] of problemas) {
+      if (!falla) continue;
+      campo.setAttribute('aria-invalid', 'true');
+      campo.focus();
+      errorConfirmar.textContent = MENSAJES[codigo];
       return;
     }
-    contactoConfirmar.setAttribute('aria-invalid', 'false');
 
     const viene = radioAsiste()?.value === 'si';
 
@@ -493,7 +461,8 @@ const MAX_ACOMPANANTES = 5;
       fila: elegido.fila,
       nombre: elegido.nombre,
       asiste: viene ? 'si' : 'no',
-      contacto,
+      mail,
+      telefono,
     });
 
     botonConfirmar.disabled = false;
@@ -559,45 +528,24 @@ const MAX_ACOMPANANTES = 5;
   const boton = $<HTMLButtonElement>('rsvp-boton');
   const error = $('rsvp-error');
   const bloqueSi = $('rsvp-si');
-  const bloqueNombres = $('rsvp-nombres');
-  const selectAcompanantes = $<HTMLSelectElement>('rsvp-acompanantes');
 
   const inputNombre = $<HTMLInputElement>('rsvp-nombre');
   const inputContacto = $<HTMLInputElement>('rsvp-contacto');
   const inputCancion = $<HTMLInputElement>('rsvp-cancion');
   const inputMensaje = $<HTMLTextAreaElement>('rsvp-mensaje');
-  const camposAcompanante = Array.from(
-    document.querySelectorAll<HTMLInputElement>('.acompanante')
-  );
 
   function asiste(): boolean {
     return (form.querySelector('input[name="asiste"]:checked') as HTMLInputElement)?.value === 'si';
   }
 
-  /** Muestra tantos campos de acompañante como personas se hayan elegido. */
-  function sincronizarAcompanantes() {
-    const cantidad = Number(selectAcompanantes.value);
-    bloqueNombres.classList.toggle('hidden', cantidad === 0);
-
-    camposAcompanante.forEach((campo, i) => {
-      const visible = i < cantidad;
-      campo.classList.toggle('hidden', !visible);
-      if (!visible) campo.value = '';
-    });
-  }
-
-  /** Quien no asiste no necesita ver nada sobre acompañantes ni canciones. */
+  /** A quien no viene no tiene caso preguntarle qué canción quiere oír. */
   function sincronizarAsistencia() {
-    const viene = asiste();
-    bloqueSi.classList.toggle('hidden', !viene);
-    if (viene) sincronizarAcompanantes();
+    bloqueSi.classList.toggle('hidden', !asiste());
   }
 
   form.querySelectorAll('input[name="asiste"]').forEach((radio) => {
     radio.addEventListener('change', sincronizarAsistencia);
   });
-
-  selectAcompanantes.addEventListener('change', sincronizarAcompanantes);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -621,14 +569,11 @@ const MAX_ACOMPANANTES = 5;
     }
 
     const viene = asiste();
-    const cantidad = viene ? Number(selectAcompanantes.value) : 0;
 
     const datos: DatosRsvp = {
       nombre,
       contacto,
       asiste: viene ? 'si' : 'no',
-      acompanantes: cantidad,
-      nombresAcompanantes: camposAcompanante.slice(0, cantidad).map((c) => c.value.trim()),
       cancion: viene ? inputCancion.value.trim() : '',
       mensaje: inputMensaje.value.trim(),
     };
@@ -647,10 +592,8 @@ const MAX_ACOMPANANTES = 5;
     }
 
     $('exito-texto').textContent = viene
-      ? cantidad > 0
-        ? `Los esperamos a ustedes ${cantidad + 1}. Nos vemos el 31 de octubre.`
-        : 'Te esperamos el 31 de octubre.'
-      : 'Gracias por avisarnos. Los vamos a extrañar esa noche.';
+      ? 'Te esperamos el 31 de octubre.'
+      : 'Gracias por avisarnos. Te vamos a extrañar esa noche.';
 
     form.reset();
     sincronizarAsistencia();
@@ -736,26 +679,6 @@ const MAX_ACOMPANANTES = 5;
     color: var(--color-bone);
   }
 
-  #buscar-resultados :global(.resultado-marca) {
-    flex-shrink: 0;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-brass);
-  }
-
-  /*
-   * En pantallas angostas la marca y el nombre no caben en el mismo renglón y
-   * el nombre se partía a media palabra. Se apilan.
-   */
-  @media (max-width: 30rem) {
-    #buscar-resultados :global(.resultado) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.3rem;
-    }
-  }
 
   /* Enlaces de navegación entre pantallas: texto, no botón. */
   .enlace-sobrio {

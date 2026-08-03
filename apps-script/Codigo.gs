@@ -35,8 +35,12 @@ var COLUMNA_NOMBRE = 'Nombre';
  * Columnas que el sitio agrega al final de `Invitados` y son las únicas que
  * escribe. Van aparte de `Confirmado` a propósito: esa la llenan los novios a
  * mano y no queremos que una confirmación desde el sitio les pise el dato.
+ *
+ * Si se renombran aquí hay que renombrarlas también en la hoja (o al revés):
+ * se localizan por encabezado, así que un nombre que no exista se crea de nuevo
+ * como columna vacía al final.
  */
-var COLUMNAS_WEB = ['Confirmó web', 'Fecha confirmación', 'Contacto web'];
+var COLUMNAS_WEB = ['Confirmó web', 'Fecha confirmación', 'Mail', 'Telefono'];
 
 var COLUMNAS_RESPUESTAS = [
   'Timestamp',
@@ -154,18 +158,20 @@ function asegurarColumnasWeb(hoja) {
   return {
     confirmo: indices[COLUMNAS_WEB[0]],
     fecha: indices[COLUMNAS_WEB[1]],
-    contacto: indices[COLUMNAS_WEB[2]],
+    mail: indices[COLUMNAS_WEB[2]],
+    telefono: indices[COLUMNAS_WEB[3]],
   };
 }
 
 /** Igual que la anterior pero sin escribir: para las lecturas del buscador. */
 function buscarColumnas(encabezados) {
-  var indices = { nombre: -1, confirmo: -1, fecha: -1, contacto: -1 };
+  var indices = { nombre: -1, confirmo: -1, fecha: -1, mail: -1, telefono: -1 };
   var mapa = {};
   mapa[COLUMNA_NOMBRE] = 'nombre';
   mapa[COLUMNAS_WEB[0]] = 'confirmo';
   mapa[COLUMNAS_WEB[1]] = 'fecha';
-  mapa[COLUMNAS_WEB[2]] = 'contacto';
+  mapa[COLUMNAS_WEB[2]] = 'mail';
+  mapa[COLUMNAS_WEB[3]] = 'telefono';
 
   for (var j = 0; j < encabezados.length; j++) {
     var clave = mapa[String(encabezados[j]).trim()];
@@ -260,12 +266,12 @@ function buscarInvitados(datos) {
     var puntaje = puntuar(tq, fq, nombre);
     if (puntaje < UMBRAL) continue;
 
-    candidatos.push({
-      fila: i + 1,
-      nombre: nombre,
-      estado: col.confirmo === -1 ? '' : String(filas[i][col.confirmo] == null ? '' : filas[i][col.confirmo]).trim(),
-      puntaje: puntaje,
-    });
+    /*
+     * A propósito no se devuelve si esa persona ya confirmó: cualquiera con la
+     * contraseña puede buscar cualquier nombre, y quién viene y quién no es
+     * asunto de los novios.
+     */
+    candidatos.push({ fila: i + 1, nombre: nombre, puntaje: puntaje });
   }
 
   candidatos.sort(function (a, b) {
@@ -294,10 +300,20 @@ function confirmarInvitado(datos) {
   var fila = entero(datos.fila, 0, 100000);
   var nombreEsperado = texto(datos.nombre, 200);
   var asiste = datos.asiste === 'si' ? 'Sí' : 'No';
-  var contacto = texto(datos.contacto, 120);
+  var mail = texto(datos.mail, 120);
+  var telefono = texto(datos.telefono, 60);
 
   if (fila < 2 || !nombreEsperado) return { ok: false, error: 'datos_invalidos' };
-  if (!contacto) return { ok: false, error: 'campos_requeridos' };
+  if (!mail || !telefono) return { ok: false, error: 'campos_requeridos' };
+
+  // Validación mínima: no sirve para bloquear a nadie, sirve para que no se
+  // cuele un teléfono en la columna del correo por un descuido.
+  if (mail.indexOf('@') < 1 || mail.indexOf('.') === -1) {
+    return { ok: false, error: 'mail_invalido' };
+  }
+  if (telefono.replace(/[^0-9]/g, '').length < 8) {
+    return { ok: false, error: 'telefono_invalido' };
+  }
 
   var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_INVITADOS);
   if (!hoja) return { ok: false, error: 'falta_hoja_invitados' };
@@ -319,7 +335,9 @@ function confirmarInvitado(datos) {
 
     hoja.getRange(fila, web.confirmo).setValue(asiste);
     hoja.getRange(fila, web.fecha).setValue(new Date());
-    hoja.getRange(fila, web.contacto).setValue(contacto);
+    hoja.getRange(fila, web.mail).setValue(mail);
+    // Como texto: si no, Sheets se come el + del código de país y los ceros.
+    hoja.getRange(fila, web.telefono).setValue(telefono).setNumberFormat('@');
   } finally {
     candado.releaseLock();
   }

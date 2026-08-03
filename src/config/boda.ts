@@ -62,17 +62,15 @@ export const boda = {
   rsvp: {
     intro:
       'Busca tu nombre en la lista y dinos si nos acompañas. Es una confirmación por persona, así que cada quien tiene que buscarse.',
-    ayudaBusqueda:
-      'Escríbelo como salga: aunque le falte un acento o se te vaya un dedo, te encontramos.',
     /** Texto del enlace que abre el formulario abierto (el plan B). */
     enlacePlanB: 'No me encuentro en la lista',
     introPlanB:
-      'Escríbenos aquí y nosotros te agregamos a mano. Si vienen varios, con un formulario por grupo basta.',
+      'Escríbenos aquí y nosotros te agregamos a mano. Es una respuesta por persona: si vienen varios, cada quien manda la suya.',
   },
 
   regalos: {
     intro:
-      'Su presencia es el regalo, pero si además quieren apoyarnos para nuestro viaje de luna de miel a las Islas de Pascua, la forma más útil para nosotros es una transferencia.',
+      'Su presencia es el regalo, pero si además quieren apoyarnos para nuestro viaje de luna de miel a la Isla de Pascua, la forma más útil para nosotros es una transferencia.',
     nota: 'Los datos aparecen aquí una vez que entraron con la contraseña.',
   },
 
@@ -82,7 +80,7 @@ export const boda = {
     bloques: [
       {
         titulo: 'Estacionamiento',
-        texto: 'No hay valet.',
+        texto: 'No hay valet. El lugar cuenta con un pequeño estacionamiento.',
       },
       {
         titulo: 'Uber, Didi y taxi',
@@ -105,12 +103,12 @@ export const boda = {
     {
       pregunta: '¿Qué tan estricto es el dress code?',
       respuesta:
-        'Etiqueta rigurosa y paleta negra. Si tienen duda sobre alguna prenda, revisen el moodboard.',
+        'Etiqueta rigurosa y paleta obscura. Si tienen duda sobre alguna prenda, revisen el moodboard.',
     },
     {
       pregunta: '¿Es una fiesta de disfraces?',
       respuesta:
-        'Es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y oscuro que por disfrazarse.',
+        'No, es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y oscuro que por disfrazarse. No es una fiesta de disfraces.',
     },
     {
       pregunta: '¿Hasta cuándo puedo confirmar?',

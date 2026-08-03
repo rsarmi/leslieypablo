@@ -110,21 +110,28 @@ Si no, la URL sigue sirviendo el código viejo. Es el error más común.
 
 ## Confirmación: el buscador de invitados
 
-El invitado escribe su nombre, el sitio lo busca en la columna `Nombre` de
-`Invitados` y le muestra los candidatos parecidos. Elige el suyo, dice si viene
-y deja un teléfono o correo. **Una confirmación por lugar**: cada persona se
-busca a sí misma.
+El invitado escribe su nombre y da **Buscarme**; el sitio lo busca en la columna
+`Nombre` de `Invitados` y le muestra los candidatos parecidos. Elige el suyo,
+dice si viene y deja correo y teléfono. **Una confirmación por lugar**: cada
+persona se busca a sí misma.
+
+La búsqueda sale solo al apretar el botón, no mientras escriben: cada consulta
+es un viaje de un par de segundos a Apps Script.
+
+**Los resultados no dicen quién ya confirmó.** El servidor ni siquiera manda ese
+dato, porque cualquiera con la contraseña puede buscar cualquier nombre.
 
 ### Las tres columnas que escribe el sitio
 
 Se crean solas la primera vez, al final de `Invitados`, después de todo lo que
 ya haya:
 
-| Columna              | Qué guarda                        |
-| -------------------- | --------------------------------- |
-| `Confirmó web`       | `Sí` o `No`                       |
-| `Fecha confirmación` | Cuándo respondió                  |
-| `Contacto web`       | El teléfono o correo que dejaron  |
+| Columna              | Qué guarda                                     |
+| -------------------- | ---------------------------------------------- |
+| `Confirmó web`       | `Sí` o `No`                                    |
+| `Fecha confirmación` | Cuándo respondió                               |
+| `Mail`               | El correo. Se pide obligatorio                 |
+| `Telefono`           | El teléfono, guardado como texto para no perder el `+` ni los ceros |
 
 **La columna `Confirmado` no se toca nunca.** Es la de trabajo de ustedes y el
 sitio no la lee ni la escribe, así que lo que marquen a mano ahí no se pierde

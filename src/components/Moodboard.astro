@@ -1,6 +1,7 @@
 ---
 import { boda } from '../config/boda';
 import { ruta } from '../lib/rutas';
+import { medir } from '../lib/medidas';
 import Seccion from './Seccion.astro';
 import Ornamento from './Ornamento.astro';
 
@@ -10,6 +11,11 @@ const { items } = boda.moodboard;
  * Mosaico irregular con `columns` de CSS: masonry real sin JavaScript ni
  * librería. Las alturas dispares las da la proporción natural de cada
  * imagen, que no se recorta.
+ *
+ * Las medidas se leen del archivo en tiempo de compilación (ver lib/medidas).
+ * Sin ellas, estas 35 imágenes en lazy load miden cero de alto hasta que bajan
+ * y luego empujan toda la página, con lo que los enlaces a secciones de más
+ * abajo caen en el lugar equivocado.
  */
 ---
 
@@ -46,6 +52,8 @@ const { items } = boda.moodboard;
           );
         }
 
+        const medidas = medir(item.src);
+
         return (
           <figure class="revelar mb-3 break-inside-avoid sm:mb-4">
             <button
@@ -58,6 +66,8 @@ const { items } = boda.moodboard;
               <img
                 src={ruta(item.src)}
                 alt={item.alt}
+                width={medidas?.ancho}
+                height={medidas?.alto}
                 loading="lazy"
                 decoding="async"
                 class="filmico block h-auto w-full transition-opacity duration-500 group-hover:opacity-85"

@@ -35,7 +35,9 @@ export type ErrorApi =
   /** La búsqueda necesita al menos tres letras. */
   | 'consulta_corta'
   /** Movieron filas en la hoja entre la búsqueda y la confirmación. */
-  | 'fila_cambio';
+  | 'fila_cambio'
+  | 'mail_invalido'
+  | 'telefono_invalido';
 
 export type ResultadoUnlock =
   | { ok: true; banco: DatosBanco }
@@ -43,13 +45,16 @@ export type ResultadoUnlock =
 
 export type ResultadoRsvp = { ok: true } | { ok: false; error: ErrorApi };
 
-/** Una fila de la pestaña `Invitados` que se parece a lo que buscaron. */
+/**
+ * Una fila de la pestaña `Invitados` que se parece a lo que buscaron.
+ *
+ * No trae si esa persona ya confirmó: el servidor no lo manda a propósito,
+ * porque cualquiera con la contraseña puede buscar cualquier nombre.
+ */
 export interface InvitadoEncontrado {
   /** Fila real en la hoja. Es el identificador: el `N°` viene repetido. */
   fila: number;
   nombre: string;
-  /** 'Sí' | 'No' | '' según lo que ya haya respondido esa persona en el sitio. */
-  estado: string;
 }
 
 export type ResultadoBusqueda =
@@ -60,15 +65,15 @@ export interface DatosConfirmacion {
   fila: number;
   nombre: string;
   asiste: 'si' | 'no';
-  contacto: string;
+  mail: string;
+  telefono: string;
 }
 
+/** Envío del formulario abierto: una persona por respuesta, sin acompañantes. */
 export interface DatosRsvp {
   nombre: string;
   contacto: string;
   asiste: 'si' | 'no';
-  acompanantes: number;
-  nombresAcompanantes: string[];
   cancion: string;
   mensaje: string;
 }
@@ -208,6 +213,8 @@ const CODIGOS: ReadonlySet<string> = new Set([
   'campos_requeridos',
   'consulta_corta',
   'fila_cambio',
+  'mail_invalido',
+  'telefono_invalido',
 ]);
 
 function codigoConocido(error: unknown): ErrorApi {
@@ -219,7 +226,15 @@ export async function enviarRsvp(datos: DatosRsvp): Promise<ResultadoRsvp> {
   if (!password) return { ok: false, error: 'password' };
 
   try {
-    const respuesta = await postear({ action: 'rsvp', password, ...datos });
+    // La pestaña `Respuestas` conserva las columnas de acompañantes de cuando
+    // el formulario los pedía, así que se mandan en cero para no descuadrarla.
+    const respuesta = await postear({
+      action: 'rsvp',
+      password,
+      ...datos,
+      acompanantes: 0,
+      nombresAcompanantes: [],
+    });
 
     if (respuesta?.ok) return { ok: true };
 
