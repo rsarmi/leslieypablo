@@ -55,8 +55,8 @@ export const boda = {
     titulo: 'Etiqueta rigurosa',
     subtitulo: 'Goth black tie',
     intro:
-      'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo, de negro, y sin miedo al drama.',
-    nota: 'Sí, es 31 de octubre. No, no es una fiesta de disfraces.',
+      'Es una boda de etiqueta rigurosa y queremos que la noche se vea como el moodboard. Vengan de largo y de negro.',
+    nota: 'Cae el 31 de octubre, así que la idea va más por la elegancia oscura que por el disfraz.',
   },
 
   regalos: {
@@ -95,12 +95,12 @@ export const boda = {
     {
       pregunta: '¿Qué tan estricto es el dress code?',
       respuesta:
-        'Bastante. Etiqueta rigurosa, paleta negra. Si tienen duda sobre una prenda, revisen el moodboard o pregúntennos.',
+        'Etiqueta rigurosa y paleta negra. Si tienen duda sobre alguna prenda, revisen el moodboard o pregúntennos.',
     },
     {
       pregunta: '¿Es una fiesta de disfraces?',
       respuesta:
-        'No. Cae en Halloween y la estética es gótica, pero es una boda de etiqueta. Nada de disfraces.',
+        'Es una boda de etiqueta con estética gótica. La idea va más por vestirse elegantísimo y oscuro que por disfrazarse.',
     },
     {
       pregunta: '¿Hay barra libre?',
