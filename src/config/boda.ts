@@ -132,16 +132,16 @@ export const boda = {
 
   moodboard: {
     /**
-     * Las 12 referencias, optimizadas en `public/moodboard/`.
+     * Las 32 referencias, optimizadas en `public/moodboard/`.
      *
      * Ninguna se recorta: cada una conserva su proporción real y el mosaico
      * se acomoda alrededor. `ratio` solo le da altura a un hueco cuando `src`
      * está vacío, así que para agregar una referencia nueva basta con dejar
      * `src` y `alt` llenos.
      *
-     * El orden importa: el mosaico llena por columnas, así que están
-     * intercaladas para que las piezas gráficas (tarjetas, carteles) no
-     * queden todas juntas.
+     * El orden importa: el mosaico llena por columnas, así que las pinturas,
+     * los Dráculas y los retratos de hombre van repartidos para que no se
+     * amontonen en la misma columna.
      */
     items: [
       {
@@ -151,8 +151,8 @@ export const boda = {
       },
       {
         ratio: '3 / 4',
-        src: 'moodboard/devore-rosas.jpg',
-        alt: 'Tres mujeres de vestido largo en terciopelo devoré negro, con rosas rojas',
+        src: 'moodboard/morticia.jpg',
+        alt: 'Vestido negro sirena con mangas de encaje deshilachado',
       },
       {
         ratio: '2 / 3',
@@ -161,13 +161,23 @@ export const boda = {
       },
       {
         ratio: '4 / 5',
-        src: 'moodboard/guantes-copa.jpg',
-        alt: 'Manos con guantes blancos y negros sirviendo una copa entre perlas',
+        src: 'moodboard/velo-esmeraldas.jpg',
+        alt: 'Velo de encaje negro sobre los ojos, con aretes de cruz y esmeraldas',
       },
       {
         ratio: '3 / 4',
-        src: 'moodboard/slip-guantes.jpg',
-        alt: 'Vestido slip negro con guantes largos de tul, en un pasillo de hotel',
+        src: 'moodboard/terciopelo-rosas.jpg',
+        alt: 'Mujer de terciopelo negro sobre un mar de telas rojas y rosas',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/martinis.jpg',
+        alt: 'Martinis y encaje negro con un listón rojo en la copa',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/cortejo-velos.jpg',
+        alt: 'Pintura de un cortejo de mujeres de luto con velos y flores rojas',
       },
       {
         ratio: '3 / 5',
@@ -175,9 +185,84 @@ export const boda = {
         alt: 'Smoking de terciopelo vino con corbata de moño negra, sirviendo champaña',
       },
       {
+        ratio: '3 / 4',
+        src: 'moodboard/devore-rosas.jpg',
+        alt: 'Tres mujeres de vestido largo en terciopelo devoré negro, con rosas rojas',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/lugosi-retrato.jpg',
+        alt: 'Bela Lugosi como Drácula, de capa y camisa de chorreras',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/slip-guantes.jpg',
+        alt: 'Vestido slip negro con guantes largos de tul, en un pasillo de hotel',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/cena-luto.jpg',
+        alt: 'Pintura de una cena de luto a la luz de las velas',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/retrato-gargantilla.jpg',
+        alt: 'Retrato en terciopelo negro con gargantilla de perla y guantes largos',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/beso-dracula.jpg',
+        alt: 'Beso a la luz de las velas, vestido rojo y levita bordada',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/antifaces.jpg',
+        alt: 'Antifaces de encaje negro en un baile de máscaras',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/mesa-luto.jpg',
+        alt: 'Mesa puesta a la luz de las velas, mantel vino y encaje negro',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/smoking-cortinas.jpg',
+        alt: 'Smoking negro cruzado ante un telón de terciopelo rojo y un candil',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/mano-sombra.jpg',
+        alt: 'Mano de uñas largas y su sombra sobre una cortina de terciopelo rojo',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/piel-crema.jpg',
+        alt: 'Abrigo de piel color crema con medias negras y tacones de charol vino',
+      },
+      {
         ratio: '2 / 3',
         src: 'moodboard/mantillas.jpg',
         alt: 'Cuatro mujeres de encaje negro y mantilla, con bordados en oro viejo',
+      },
+      {
+        ratio: '16 / 9',
+        src: 'moodboard/espejo-dracula.jpg',
+        alt: 'Vestido rojo reflejado en un espejo dorado',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/pintura-roja.jpg',
+        alt: 'Pintura de una mujer de rojo rodeada de figuras en penumbra',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/cutout-guantes.jpg',
+        alt: 'Vestido negro de satén con cut-out y guantes largos de piel',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/lugosi-pintura.jpg',
+        alt: 'Retrato al óleo de Drácula de capa negra sobre un muro rojo',
       },
       {
         ratio: '4 / 5',
@@ -186,18 +271,33 @@ export const boda = {
       },
       {
         ratio: '3 / 4',
-        src: 'moodboard/smoking-cortinas.jpg',
-        alt: 'Smoking negro cruzado ante un telón de terciopelo rojo y un candil',
+        src: 'moodboard/bar-lentejuelas.jpg',
+        alt: 'Dos mujeres en la barra, lentejuelas vino y plumas negras',
+      },
+      {
+        ratio: '3 / 4',
+        src: 'moodboard/plumas-marco.jpg',
+        alt: 'Vestido negro con mangas de plumas junto a un marco dorado',
       },
       {
         ratio: '2 / 3',
-        src: 'moodboard/mesa-encaje.jpg',
-        alt: 'Mesa puesta a la luz de las velas, mantel vino y encaje negro',
+        src: 'moodboard/lucy-cementerio.jpg',
+        alt: 'Capa de gasa naranja al vuelo entre lápidas',
       },
       {
         ratio: '2 / 3',
         src: 'moodboard/velos-perlas.jpg',
         alt: 'Dos mujeres con velos sobre los ojos, perlas y labios oscuros',
+      },
+      {
+        ratio: '2 / 3',
+        src: 'moodboard/mantilla-cruz.jpg',
+        alt: 'Mantilla de encaje negro bajo una cruz de luz roja',
+      },
+      {
+        ratio: '4 / 5',
+        src: 'moodboard/guantes-copa.jpg',
+        alt: 'Manos con guantes blancos y negros sirviendo una copa entre perlas',
       },
       {
         ratio: '4 / 5',
