@@ -1,0 +1,61 @@
+---
+import { boda } from '../config/boda';
+import Seccion from './Seccion.astro';
+---
+
+<Seccion id="faq" eyebrow="Por si acaso" titulo="Dudas" fondo="elevado" ancho="normal">
+  <div class="revelar border-brass/20 border-t">
+    {
+      boda.faq.map((item) => (
+        <details class="faq border-brass/20 group border-b">
+          <summary
+            class="flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-left"
+          >
+            <span class="text-bone group-hover:text-ember font-display text-xl transition-colors sm:text-2xl">
+              {item.pregunta}
+            </span>
+
+            {/* Cruz que gira 45° al abrir: mismo elemento para + y ×. */}
+            <span
+              class="text-brass faq-signo shrink-0 text-2xl leading-none transition-transform duration-300"
+              aria-hidden="true"
+            >
+              +
+            </span>
+          </summary>
+
+          <p class="text-bone-dim max-w-2xl pr-10 pb-7 text-lg leading-relaxed">{item.respuesta}</p>
+        </details>
+      ))
+    }
+  </div>
+
+  <p class="revelar text-ash mt-12 text-center text-base italic">
+    ¿Quedó algo fuera? Escríbannos directamente y lo resolvemos.
+  </p>
+</Seccion>
+
+<script>
+  // Acordeón: abrir una cierra las demás. `details` ya es accesible por sí solo.
+  const items = document.querySelectorAll<HTMLDetailsElement>('details.faq');
+
+  items.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (!item.open) return;
+      items.forEach((otro) => {
+        if (otro !== item) otro.open = false;
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Safari sigue pintando su triángulo si no se le quita explícitamente. */
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq[open] .faq-signo {
+    transform: rotate(45deg);
+  }
+</style>

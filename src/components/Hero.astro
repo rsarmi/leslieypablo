@@ -1,0 +1,140 @@
+---
+import { boda } from '../config/boda';
+import Ornamento from './Ornamento.astro';
+---
+
+<section id="inicio" class="vineta relative flex min-h-[100svh] items-center justify-center px-5 py-20">
+  {/*
+    Hueco para la imagen de portada. Cuando la tengan, se sustituye este div por
+    una <img> con las mismas clases y se sube la opacidad a ~0.35.
+  */}
+  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+    <div
+      class="absolute inset-0"
+      style="background: radial-gradient(ellipse 80% 60% at 50% 38%, rgba(74,10,13,0.55), transparent 72%), radial-gradient(ellipse 50% 40% at 50% 100%, rgba(142,17,22,0.2), transparent 70%)"
+    >
+    </div>
+    {/* PLACEHOLDER PORTADA: reemplazar por <img src="/moodboard/portada.jpg" class="h-full w-full object-cover opacity-35" /> */}
+  </div>
+
+  <div class="relative w-full max-w-3xl text-center">
+    <div class="revelar mb-6 flex justify-center sm:mb-8">
+      <Ornamento tipo="murcielago" class="text-brass/70 h-11 w-auto sm:h-14" />
+    </div>
+
+    <p class="revelar eyebrow mb-5">Nos casamos</p>
+
+    <h1 class="revelar text-bone text-[clamp(3.25rem,15vw,8rem)] leading-[0.95]">
+      <span class="block">{boda.novios.ella}</span>
+      <span class="text-blood my-1 block text-[0.42em] italic sm:my-2" style="font-family:var(--font-serif)">
+        &
+      </span>
+      <span class="block">{boda.novios.el}</span>
+    </h1>
+
+    <div class="revelar mt-8 flex items-center justify-center gap-5" aria-hidden="true">
+      <span class="filete w-14 sm:w-24"></span>
+      <Ornamento tipo="daga" class="text-brass h-9 w-auto shrink-0" />
+      <span class="filete w-14 sm:w-24"></span>
+    </div>
+
+    <p class="revelar text-bone mt-7 font-mono text-xs tracking-[0.32em] uppercase sm:text-sm sm:tracking-[0.42em]">
+      {boda.fecha.displayCorto}
+    </p>
+
+    <p class="revelar text-bone-dim mt-3 text-lg italic sm:text-xl">
+      {boda.venue.nombre} · Ciudad de México
+    </p>
+
+    {/* Cuenta regresiva: se llena en el cliente para no servir HTML rancio. */}
+    <div
+      id="cuenta"
+      class="revelar text-bone-dim mt-9 flex justify-center gap-6 font-mono sm:gap-10"
+      aria-live="off"
+    >
+      {
+        [
+          ['dias', 'Días'],
+          ['horas', 'Horas'],
+          ['minutos', 'Min'],
+          ['segundos', 'Seg'],
+        ].map(([id, etiqueta]) => (
+          <div class="text-center">
+            <span
+              id={`cuenta-${id}`}
+              class="text-bone block text-2xl tabular-nums sm:text-3xl"
+              style="font-family:var(--font-display)"
+            >
+              —
+            </span>
+            <span class="text-brass mt-1.5 block text-[0.5625rem] tracking-[0.22em] uppercase">
+              {etiqueta}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+
+    <a href="#rsvp" class="revelar btn mt-10 inline-flex"> Confirmar asistencia </a>
+  </div>
+
+  {/* En pantallas bajas el hero ya no cabe y este enlace se encimaría con el botón. */}
+  <a
+    href="#la-boda"
+    class="bajar text-brass/60 hover:text-brass absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-[0.5625rem] tracking-[0.28em] uppercase transition-colors"
+  >
+    Bajar
+  </a>
+</section>
+
+<style>
+  @media (max-height: 780px) {
+    .bajar {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { boda } from '../config/boda';
+
+  const destino = new Date(boda.fecha.iso).getTime();
+
+  const celdas = {
+    dias: document.getElementById('cuenta-dias'),
+    horas: document.getElementById('cuenta-horas'),
+    minutos: document.getElementById('cuenta-minutos'),
+    segundos: document.getElementById('cuenta-segundos'),
+  };
+
+  const dosDigitos = (n: number) => String(n).padStart(2, '0');
+
+  function actualizar() {
+    const restante = destino - Date.now();
+
+    if (restante <= 0) {
+      // Ya llegó el día: en vez de números en cero, un mensaje.
+      const contenedor = document.getElementById('cuenta');
+      if (contenedor) {
+        contenedor.innerHTML =
+          '<p class="text-bone font-serif text-xl italic sm:text-2xl">Hoy es la noche.</p>';
+      }
+      return true;
+    }
+
+    const segundosTotales = Math.floor(restante / 1000);
+
+    celdas.dias!.textContent = String(Math.floor(segundosTotales / 86400));
+    celdas.horas!.textContent = dosDigitos(Math.floor(segundosTotales / 3600) % 24);
+    celdas.minutos!.textContent = dosDigitos(Math.floor(segundosTotales / 60) % 60);
+    celdas.segundos!.textContent = dosDigitos(segundosTotales % 60);
+
+    return false;
+  }
+
+  if (!actualizar()) {
+    const reloj = setInterval(() => {
+      if (actualizar()) clearInterval(reloj);
+    }, 1000);
+  }
+</script>

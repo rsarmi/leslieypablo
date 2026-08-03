@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+.env
+.env.*
+.playwright-mcp/
+
+# Material de referencia, no assets del sitio. Se queda local a propósito:
+# este repo es público y varias de esas imágenes son de terceros (el cartel de
+# Nosferatu, la pintura de Waterhouse). Las imágenes que sí se publican van en
+# public/moodboard/.
+moodboard/
+

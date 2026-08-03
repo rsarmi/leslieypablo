@@ -1,0 +1,75 @@
+---
+import { boda } from '../config/boda';
+
+const enlaces = [
+  { href: '#la-boda', texto: 'La boda' },
+  { href: '#como-llegar', texto: 'Cómo llegar' },
+  { href: '#dress-code', texto: 'Dress code' },
+  { href: '#moodboard', texto: 'Moodboard' },
+  { href: '#regalos', texto: 'Regalos' },
+  { href: '#faq', texto: 'Dudas' },
+];
+---
+
+<header
+  id="nav"
+  class="fixed inset-x-0 top-0 z-50 -translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+>
+  <nav
+    class="border-brass/20 bg-ink/92 border-b backdrop-blur-md"
+    aria-label="Navegación principal"
+  >
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5 sm:px-8">
+      <a
+        href="#inicio"
+        class="font-display text-bone hover:text-ember shrink-0 text-2xl transition-colors"
+      >
+        {boda.novios.monograma}
+      </a>
+
+      {/* En móvil la lista scrollea en horizontal en vez de esconderse tras un menú. */}
+      <ul
+        class="scrollbar-oculto flex items-center gap-5 overflow-x-auto sm:gap-7"
+        style="scrollbar-width:none"
+      >
+        {
+          enlaces.map(({ href, texto }) => (
+            <li class="shrink-0">
+              <a
+                href={href}
+                class="text-bone-dim hover:text-bone font-mono text-[0.625rem] tracking-[0.18em] whitespace-nowrap uppercase transition-colors sm:text-[0.6875rem] sm:tracking-[0.2em]"
+              >
+                {texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a href="#rsvp" class="btn shrink-0 px-5 py-2.5 text-[0.625rem] max-sm:hidden"> Confirmar </a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  // El nav aparece cuando el hero ya se fue: en la portada estorba.
+  const nav = document.getElementById('nav') as HTMLElement;
+  const hero = document.getElementById('inicio');
+
+  if (hero) {
+    new IntersectionObserver(
+      ([entrada]) => {
+        nav.classList.toggle('-translate-y-full', entrada.isIntersecting);
+      },
+      { rootMargin: '-72px 0px 0px 0px' }
+    ).observe(hero);
+  } else {
+    nav.classList.remove('-translate-y-full');
+  }
+</script>
+
+<style>
+  .scrollbar-oculto::-webkit-scrollbar {
+    display: none;
+  }
+</style>

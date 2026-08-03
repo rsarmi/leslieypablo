@@ -1,0 +1,133 @@
+---
+import { boda } from '../config/boda';
+import Seccion from './Seccion.astro';
+import Ornamento from './Ornamento.astro';
+
+/**
+ * Los datos bancarios NO están en el HTML ni en el bundle: llegan en la
+ * respuesta del `unlock` del gate, que solo responde con la contraseña
+ * correcta. Por eso este bloque se pinta en el cliente.
+ */
+---
+
+<Seccion
+  id="regalos"
+  eyebrow="Si insisten"
+  titulo="Regalos"
+  intro={boda.regalos.intro}
+  fondo="sangre"
+  ancho="estrecho"
+>
+  <div class="revelar border-brass/30 bg-ink/60 border p-7 text-center sm:p-11">
+    <Ornamento tipo="corazon" class="text-blood/70 mx-auto mb-8 h-14 w-14" />
+
+    {/* Estado inicial: aún no llega la respuesta del servidor. */}
+    <p id="banco-cargando" class="text-ash font-mono text-[0.6875rem] tracking-[0.2em] uppercase">
+      Cargando…
+    </p>
+
+    <dl id="banco-datos" class="hidden space-y-6 text-left"></dl>
+
+    <p id="banco-vacio" class="text-bone-dim hidden text-lg italic">
+      Todavía estamos preparando esta parte. Vuelvan en unos días.
+    </p>
+
+    <p id="banco-copiado" class="text-brass mt-6 min-h-5 font-mono text-[0.6875rem] tracking-[0.2em] uppercase" role="status" aria-live="polite"></p>
+  </div>
+
+  <p class="revelar text-ash mt-10 text-center text-base italic">
+    {boda.regalos.nota}
+  </p>
+</Seccion>
+
+<script>
+  import { alRecibirBanco, type DatosBanco } from '../lib/api';
+
+  const cargando = document.getElementById('banco-cargando') as HTMLElement;
+  const contenedor = document.getElementById('banco-datos') as HTMLElement;
+  const vacio = document.getElementById('banco-vacio') as HTMLElement;
+  const avisoCopiado = document.getElementById('banco-copiado') as HTMLElement;
+
+  const ETIQUETAS: Array<[keyof DatosBanco, string, boolean]> = [
+    // [clave, etiqueta, ¿lleva botón de copiar?]
+    ['titular', 'A nombre de', false],
+    ['banco', 'Banco', false],
+    ['clabe', 'CLABE', true],
+    ['cuenta', 'Cuenta', true],
+  ];
+
+  function crearFila(etiqueta: string, valor: string, copiable: boolean): HTMLElement {
+    const fila = document.createElement('div');
+    fila.className = 'border-brass/20 border-b pb-5 last:border-0';
+
+    const dt = document.createElement('dt');
+    dt.className = 'etiqueta';
+    dt.textContent = etiqueta;
+
+    const dd = document.createElement('dd');
+    dd.className = 'flex flex-wrap items-center justify-between gap-3';
+
+    const texto = document.createElement('span');
+    // Los números se leen mucho mejor en monoespaciada con tracking.
+    texto.className = copiable
+      ? 'text-bone font-mono text-lg tracking-[0.1em] break-all'
+      : 'text-bone text-xl';
+    texto.textContent = valor;
+    dd.appendChild(texto);
+
+    if (copiable) {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.className = 'btn btn-ghost shrink-0 px-4 py-2 text-[0.625rem]';
+      boton.textContent = 'Copiar';
+      boton.addEventListener('click', () => void copiar(valor, etiqueta));
+      dd.appendChild(boton);
+    }
+
+    fila.append(dt, dd);
+    return fila;
+  }
+
+  async function copiar(valor: string, etiqueta: string) {
+    try {
+      await navigator.clipboard.writeText(valor);
+      avisoCopiado.textContent = `${etiqueta} copiada`;
+    } catch {
+      // Safari sin HTTPS y navegadores viejos no tienen clipboard API.
+      avisoCopiado.textContent = 'No se pudo copiar. Selecciónenla a mano';
+    }
+    setTimeout(() => (avisoCopiado.textContent = ''), 3000);
+  }
+
+  /**
+   * Puede correr más de una vez (el gate reintenta el unlock en segundo plano),
+   * así que reinicia los tres estados en cada pasada en vez de solo encender el
+   * que toca. Si no, un primer render vacío deja el mensaje de "aún no hay
+   * datos" pegado debajo de los datos reales.
+   */
+  alRecibirBanco((banco) => {
+    const filas = ETIQUETAS.filter(([clave]) => banco[clave]).map(([clave, etiqueta, copiable]) =>
+      crearFila(etiqueta, banco[clave], copiable)
+    );
+
+    // Sin filas = todavía no llenaron la pestaña Config de la hoja.
+    const hayDatos = filas.length > 0;
+
+    if (hayDatos) {
+      contenedor.replaceChildren(...filas);
+
+      if (banco.nota) {
+        const nota = document.createElement('p');
+        nota.className = 'text-bone-dim pt-2 text-base italic';
+        nota.textContent = banco.nota;
+        contenedor.appendChild(nota);
+      }
+    } else {
+      contenedor.replaceChildren();
+    }
+
+    cargando.classList.add('hidden');
+    contenedor.classList.toggle('hidden', !hayDatos);
+    vacio.classList.toggle('hidden', hayDatos);
+  });
+</script>

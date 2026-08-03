@@ -1,0 +1,282 @@
+@import 'tailwindcss';
+
+/* Tipografías self-hosted: nada sale hacia el CDN de Google. */
+@import '@fontsource/grenze-gotisch/latin-400.css';
+@import '@fontsource/grenze-gotisch/latin-500.css';
+@import '@fontsource/grenze-gotisch/latin-700.css';
+@import '@fontsource/cormorant-garamond/latin-300.css';
+@import '@fontsource/cormorant-garamond/latin-400.css';
+@import '@fontsource/cormorant-garamond/latin-400-italic.css';
+@import '@fontsource/cormorant-garamond/latin-600.css';
+@import '@fontsource/courier-prime/latin-400.css';
+@import '@fontsource/courier-prime/latin-700.css';
+
+@theme {
+  /* Paleta: sacada directamente del moodboard. */
+  --color-ink: #0b0708; /* negro cálido, fondo base */
+  --color-ink-2: #140d0e; /* superficie elevada */
+  --color-oxblood: #4a0a0d; /* vino profundo, bloques */
+  --color-blood: #8e1116; /* rojo del moodboard, acentos */
+  --color-ember: #c2323a; /* hover, énfasis */
+  --color-bone: #e8e0d2; /* texto principal, pergamino */
+  --color-bone-dim: #b9b0a1; /* texto secundario sobre oscuro */
+  --color-brass: #b08d4f; /* filos dorados, ornamentos */
+  --color-ash: #6f6660; /* bordes, texto terciario */
+
+  --font-display: 'Grenze Gotisch', 'Times New Roman', serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-mono: 'Courier Prime', 'Courier New', monospace;
+
+  --ease-vela: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  * {
+    border-color: color-mix(in srgb, var(--color-brass) 22%, transparent);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* El nav sticky no debe tapar el título de la sección al saltar a un ancla. */
+    scroll-padding-top: 5.5rem;
+    background-color: var(--color-ink);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    line-height: 1.7;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--color-blood);
+    color: var(--color-bone);
+  }
+
+  /* Foco visible y temático: nunca quitarlo, solo vestirlo. */
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
+  }
+
+  /* Autofill de Chrome pinta el input de azul claro; lo devolvemos a la paleta. */
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-bone);
+    -webkit-box-shadow: 0 0 0 1000px var(--color-ink-2) inset;
+    caret-color: var(--color-bone);
+  }
+}
+
+@layer components {
+  /* --- Etiquetas mecanografiadas: el "DATE: OCTOBER 30TH" del moodboard --- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-brass);
+  }
+
+  /* --- Botón principal --- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.9rem 2.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--color-bone);
+    background-color: var(--color-oxblood);
+    border: 1px solid color-mix(in srgb, var(--color-brass) 45%, transparent);
+    cursor: pointer;
+    transition:
+      background-color 0.35s var(--ease-vela),
+      border-color 0.35s var(--ease-vela),
+      transform 0.35s var(--ease-vela);
+  }
+
+  .btn:hover:not(:disabled) {
+    background-color: var(--color-blood);
+    border-color: var(--color-brass);
+    transform: translateY(-1px);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--color-brass) 35%, transparent);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-oxblood) 55%, transparent);
+  }
+
+  /* --- Campos de formulario --- */
+  .campo {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background-color: var(--color-ink-2);
+    border: 1px solid color-mix(in srgb, var(--color-brass) 25%, transparent);
+    color: var(--color-bone);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    transition:
+      border-color 0.3s var(--ease-vela),
+      background-color 0.3s var(--ease-vela);
+  }
+
+  .campo::placeholder {
+    color: var(--color-ash);
+    font-style: italic;
+  }
+
+  .campo:hover {
+    border-color: color-mix(in srgb, var(--color-brass) 45%, transparent);
+  }
+
+  .campo:focus {
+    border-color: var(--color-brass);
+    background-color: color-mix(in srgb, var(--color-oxblood) 22%, var(--color-ink-2));
+    outline: none;
+  }
+
+  .campo[aria-invalid='true'] {
+    border-color: var(--color-ember);
+  }
+
+  .etiqueta {
+    display: block;
+    margin-bottom: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-bone-dim);
+  }
+
+  /* select nativo: quitamos la flecha del sistema y ponemos una nuestra */
+  select.campo {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--color-brass) 50%),
+      linear-gradient(135deg, var(--color-brass) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.15rem) calc(50% + 2px),
+      calc(100% - 0.8rem) calc(50% + 2px);
+    background-size:
+      6px 6px,
+      6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 2.5rem;
+  }
+}
+
+@layer utilities {
+  /* --- Revelado al hacer scroll --- */
+  .revelar {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.9s var(--ease-vela),
+      transform 0.9s var(--ease-vela);
+    will-change: opacity, transform;
+  }
+
+  .revelar.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* --- Arco ojival: el marco de la catedral del moodboard --- */
+  .arco {
+    border-top-left-radius: 50% 22%;
+    border-top-right-radius: 50% 22%;
+    /* El vértice apuntado se logra con el clip encima del radio. */
+    clip-path: polygon(
+      0% 100%,
+      0% 30%,
+      8% 16%,
+      22% 6%,
+      50% 0%,
+      78% 6%,
+      92% 16%,
+      100% 30%,
+      100% 100%
+    );
+  }
+
+  .arco-suave {
+    border-top-left-radius: 50% 30%;
+    border-top-right-radius: 50% 30%;
+  }
+
+  /* --- Regla horizontal que se desvanece en los extremos --- */
+  .filete {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      color-mix(in srgb, var(--color-brass) 60%, transparent),
+      transparent
+    );
+  }
+
+  /* --- Viñeta para el borde de las secciones --- */
+  .vineta::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 45%,
+      color-mix(in srgb, var(--color-ink) 75%, transparent) 100%
+    );
+  }
+}
+
+/* Nadie debería marearse leyendo una invitación de boda. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .revelar {
+    opacity: 1;
+    transform: none;
+  }
+}

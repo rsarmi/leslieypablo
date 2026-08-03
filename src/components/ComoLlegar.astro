@@ -1,0 +1,66 @@
+---
+import { boda } from '../config/boda';
+import Seccion from './Seccion.astro';
+---
+
+<Seccion
+  id="como-llegar"
+  eyebrow="La Guerrero"
+  titulo="Cómo llegar"
+  intro={boda.comoLlegar.intro}
+  fondo="elevado"
+  ancho="ancho"
+>
+  <div class="revelar border-brass/25 relative border">
+    {/*
+      El iframe de Maps llega en blanco brillante y rompe la paleta.
+      El filtro lo invierte a un mapa oscuro sin cargar una API de estilos.
+    */}
+    <iframe
+      src={boda.venue.mapsEmbedUrl}
+      title={`Mapa de ${boda.venue.nombre}`}
+      class="mapa block h-[320px] w-full sm:h-[420px]"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen></iframe>
+
+    <div
+      class="border-brass/25 bg-ink flex flex-col gap-4 border-t px-6 py-5 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <address class="text-bone-dim text-base not-italic">
+        <span class="text-bone font-display block text-xl">{boda.venue.nombre}</span>
+        {boda.venue.calle} · {boda.venue.colonia}
+      </address>
+
+      <a
+        href={boda.venue.mapsUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-ghost shrink-0"
+      >
+        Trazar ruta
+      </a>
+    </div>
+  </div>
+
+  <div class="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
+    {
+      boda.comoLlegar.bloques.map((bloque) => (
+        <article class="revelar">
+          <h3 class="text-bone mb-3 text-2xl">{bloque.titulo}</h3>
+          <p class="text-bone-dim text-base leading-relaxed">{bloque.texto}</p>
+        </article>
+      ))
+    }
+  </div>
+</Seccion>
+
+<style>
+  /*
+   * Truco conocido: invertir + rotar el matiz convierte el mapa claro de Google
+   * en uno oscuro. Se le baja saturación y contraste para que no compita.
+   */
+  .mapa {
+    filter: invert(0.92) hue-rotate(180deg) saturate(0.55) contrast(0.88) brightness(0.95);
+  }
+</style>

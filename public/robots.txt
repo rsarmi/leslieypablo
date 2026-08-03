@@ -1,0 +1,3 @@
+# Sitio privado de boda. No queremos que aparezca en buscadores.
+User-agent: *
+Disallow: /

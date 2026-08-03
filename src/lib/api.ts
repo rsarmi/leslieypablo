@@ -1,0 +1,174 @@
+/**
+ * Cliente del Web App de Google Apps Script.
+ *
+ * Por qué `Content-Type: text/plain` y no `application/json`:
+ * Apps Script no responde al preflight OPTIONS que dispara un JSON request.
+ * Con text/plain el navegador lo trata como "simple request", se salta el
+ * preflight, y el servidor parsea el body con JSON.parse a mano. Es el único
+ * camino que funciona sin proxy. NO cambiar a application/json.
+ */
+
+import { boda } from '../config/boda';
+
+const ENDPOINT = boda.api.endpoint;
+
+/** Apps Script arranca en frío y a veces tarda. Mejor esperar que fallar en seco. */
+const TIMEOUT_MS = 25_000;
+
+/** Versionada: si algún día cambia la contraseña, subir el número invalida a todos. */
+const CLAVE_STORAGE = 'boda-lp:v1:pass';
+
+export interface DatosBanco {
+  titular: string;
+  banco: string;
+  clabe: string;
+  cuenta: string;
+  nota: string;
+}
+
+export type ErrorApi = 'password' | 'red' | 'servidor' | 'sin_configurar' | 'campos_requeridos';
+
+export type ResultadoUnlock =
+  | { ok: true; banco: DatosBanco }
+  | { ok: false; error: ErrorApi };
+
+export type ResultadoRsvp = { ok: true } | { ok: false; error: ErrorApi };
+
+export interface DatosRsvp {
+  nombre: string;
+  contacto: string;
+  asiste: 'si' | 'no';
+  acompanantes: number;
+  nombresAcompanantes: string[];
+  cancion: string;
+  mensaje: string;
+}
+
+// ---------------------------------------------------------------------------
+// Contraseña recordada
+// ---------------------------------------------------------------------------
+
+/**
+ * localStorage y no sessionStorage: los invitados van a abrir el link desde
+ * WhatsApp varias veces a lo largo de meses y no queremos que reescriban la
+ * contraseña cada vez. La contraseña no protege nada crítico.
+ */
+export function leerPassword(): string | null {
+  try {
+    return localStorage.getItem(CLAVE_STORAGE);
+  } catch {
+    // Safari en privado tira al tocar localStorage.
+    return null;
+  }
+}
+
+export function guardarPassword(password: string): void {
+  try {
+    localStorage.setItem(CLAVE_STORAGE, password);
+  } catch {
+    /* sin storage el sitio sigue funcionando, solo hay que reescribir */
+  }
+}
+
+export function olvidarPassword(): void {
+  try {
+    localStorage.removeItem(CLAVE_STORAGE);
+  } catch {
+    /* nada que hacer */
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Peticiones
+// ---------------------------------------------------------------------------
+
+function endpointConfigurado(): boolean {
+  return !ENDPOINT.includes('PEGAR_ID_AQUI');
+}
+
+async function postear(payload: Record<string, unknown>): Promise<any> {
+  if (!endpointConfigurado()) {
+    throw new ErrorSinConfigurar();
+  }
+
+  const control = new AbortController();
+  const reloj = setTimeout(() => control.abort(), TIMEOUT_MS);
+
+  try {
+    const respuesta = await fetch(ENDPOINT, {
+      method: 'POST',
+      // Ver la nota de arriba: text/plain es intencional.
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow',
+      signal: control.signal,
+    });
+
+    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
+    return await respuesta.json();
+  } finally {
+    clearTimeout(reloj);
+  }
+}
+
+class ErrorSinConfigurar extends Error {}
+
+/** Valida la contraseña contra el servidor y, si es correcta, trae los datos bancarios. */
+export async function unlock(password: string): Promise<ResultadoUnlock> {
+  try {
+    const datos = await postear({ action: 'unlock', password });
+
+    if (datos?.ok) {
+      return { ok: true, banco: datos.banco as DatosBanco };
+    }
+
+    return { ok: false, error: datos?.error === 'password' ? 'password' : 'servidor' };
+  } catch (err) {
+    if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
+    return { ok: false, error: 'red' };
+  }
+}
+
+export async function enviarRsvp(datos: DatosRsvp): Promise<ResultadoRsvp> {
+  const password = leerPassword();
+  if (!password) return { ok: false, error: 'password' };
+
+  try {
+    const respuesta = await postear({ action: 'rsvp', password, ...datos });
+
+    if (respuesta?.ok) return { ok: true };
+
+    const error = respuesta?.error;
+    if (error === 'password' || error === 'campos_requeridos') {
+      return { ok: false, error };
+    }
+    return { ok: false, error: 'servidor' };
+  } catch (err) {
+    if (err instanceof ErrorSinConfigurar) return { ok: false, error: 'sin_configurar' };
+    return { ok: false, error: 'red' };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Puente entre el gate y la sección de regalos
+// ---------------------------------------------------------------------------
+
+/**
+ * Los datos bancarios llegan en la respuesta del unlock, pero quien los pinta
+ * es Regalos.astro. En vez de acoplar los dos componentes, el gate emite un
+ * evento y Regalos escucha. Se guarda el último valor porque Regalos puede
+ * montar después de que el gate ya resolvió.
+ */
+const EVENTO_BANCO = 'boda:banco';
+
+let bancoActual: DatosBanco | null = null;
+
+export function publicarBanco(banco: DatosBanco): void {
+  bancoActual = banco;
+  window.dispatchEvent(new CustomEvent<DatosBanco>(EVENTO_BANCO, { detail: banco }));
+}
+
+export function alRecibirBanco(callback: (banco: DatosBanco) => void): void {
+  if (bancoActual) callback(bancoActual);
+  window.addEventListener(EVENTO_BANCO, (e) => callback((e as CustomEvent<DatosBanco>).detail));
+}

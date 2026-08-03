@@ -1,0 +1,104 @@
+---
+import '../styles/global.css';
+import { boda } from '../config/boda';
+import { ruta } from '../lib/rutas';
+
+interface Props {
+  titulo?: string;
+}
+
+const { titulo = boda.meta.titulo } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={boda.meta.descripcion} />
+
+    <!-- Sitio privado: fuera de buscadores. Va acompañado de public/robots.txt. -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="googlebot" content="noindex, nofollow" />
+
+    <meta name="theme-color" content="#0b0708" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href={ruta('favicon.svg')} type="image/svg+xml" />
+  </head>
+
+  <body>
+    <!-- Grano de película: es lo que más acerca la pantalla al moodboard impreso. -->
+    <div class="grano" aria-hidden="true"></div>
+
+    <slot />
+
+    <script>
+      // Revelado progresivo al hacer scroll. Sin librería: IntersectionObserver basta.
+      const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const objetivos = document.querySelectorAll<HTMLElement>('.revelar');
+
+      if (reducido) {
+        objetivos.forEach((el) => el.classList.add('visible'));
+      } else {
+        const observador = new IntersectionObserver(
+          (entradas) => {
+            for (const entrada of entradas) {
+              if (!entrada.isIntersecting) continue;
+              entrada.target.classList.add('visible');
+              observador.unobserve(entrada.target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+        );
+
+        objetivos.forEach((el, i) => {
+          // Escalonado suave dentro de cada grupo, tope de 400ms para que nada se sienta lento.
+          el.style.transitionDelay = `${Math.min(i % 6, 5) * 80}ms`;
+          observador.observe(el);
+        });
+      }
+    </script>
+
+    <style is:global>
+      /*
+       * Textura de grano vía SVG en data URI: sin request extra y sin imagen.
+       * `mix-blend-mode: overlay` la funde con el fondo en vez de emblanquecerlo.
+       */
+      .grano {
+        position: fixed;
+        inset: -50%;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.16;
+        mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+      }
+
+      /* La animación del grano es cara en móvil; solo en pantallas grandes. */
+      @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+        .grano {
+          animation: granear 700ms steps(4) infinite;
+        }
+
+        @keyframes granear {
+          0% {
+            transform: translate(0, 0);
+          }
+          25% {
+            transform: translate(-2%, 1%);
+          }
+          50% {
+            transform: translate(1%, -2%);
+          }
+          75% {
+            transform: translate(-1%, -1%);
+          }
+          100% {
+            transform: translate(0, 0);
+          }
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,216 @@
+---
+import { boda } from '../config/boda';
+import Ornamento from './Ornamento.astro';
+
+/**
+ * Puerta de contraseña.
+ *
+ * Honestidad sobre el alcance: en un sitio estático esto es una cortesía, no
+ * seguridad. El HTML de la página ya está en el navegador. Lo que sí queda
+ * genuinamente protegido son los datos bancarios, porque solo existen en la
+ * respuesta del servidor tras validar la contraseña.
+ *
+ * Se renderiza oculto por defecto y el script decide si mostrarlo, para que
+ * quien ya entró antes no vea un parpadeo de la pantalla de contraseña.
+ */
+---
+
+<div
+  id="gate"
+  class="bg-ink fixed inset-0 z-[9998] hidden items-center justify-center px-6"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="gate-titulo"
+>
+  {/* Halo cálido detrás del arco, como una vela detrás de la puerta. */}
+  <div
+    class="pointer-events-none absolute inset-0"
+    style="background: radial-gradient(ellipse 70% 50% at 50% 42%, rgba(142,17,22,0.22), transparent 70%)"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="relative w-full max-w-sm text-center">
+    <div class="mb-9 flex justify-center">
+      <Ornamento tipo="corazon" class="text-blood h-20 w-20 gate-vela" />
+    </div>
+
+    <p class="eyebrow mb-4">Solo por invitación</p>
+
+    <h1 id="gate-titulo" class="text-bone mb-3 text-[clamp(2.5rem,10vw,3.5rem)]">
+      {boda.novios.ella} & {boda.novios.el}
+    </h1>
+
+    <p class="text-bone-dim mb-9 font-mono text-[0.6875rem] tracking-[0.3em] uppercase">
+      {boda.fecha.displayCorto}
+    </p>
+
+    <form id="gate-form" novalidate>
+      <label class="etiqueta text-left" for="gate-password">Contraseña</label>
+      <input
+        id="gate-password"
+        name="password"
+        type="password"
+        class="campo text-center tracking-[0.2em]"
+        autocomplete="current-password"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        required
+        aria-describedby="gate-error"
+      />
+
+      <p
+        id="gate-error"
+        class="text-ember mt-3 min-h-5 font-mono text-[0.6875rem] tracking-[0.14em] uppercase"
+        role="alert"
+        aria-live="polite"
+      >
+      </p>
+
+      <button id="gate-boton" type="submit" class="btn mt-5 w-full"> Entrar </button>
+    </form>
+
+    <p class="text-ash mt-8 text-sm italic">
+      La contraseña viene en su invitación.
+    </p>
+  </div>
+</div>
+
+<script>
+  import { unlock, leerPassword, guardarPassword, olvidarPassword, publicarBanco } from '../lib/api';
+  import { boda } from '../config/boda';
+
+  const gate = document.getElementById('gate') as HTMLElement;
+  const form = document.getElementById('gate-form') as HTMLFormElement;
+  const input = document.getElementById('gate-password') as HTMLInputElement;
+  const boton = document.getElementById('gate-boton') as HTMLButtonElement;
+  const error = document.getElementById('gate-error') as HTMLElement;
+
+  const MENSAJES: Record<string, string> = {
+    password: 'Contraseña incorrecta',
+    red: 'Sin conexión. Inténtenlo otra vez',
+    servidor: 'Algo falló. Inténtenlo otra vez',
+    sin_configurar: 'El sitio aún no está conectado',
+  };
+
+  function mostrarGate() {
+    gate.classList.remove('hidden');
+    gate.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    input.focus();
+  }
+
+  function ocultarGate() {
+    gate.classList.add('hidden');
+    gate.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  function pintarError(codigo: string | null) {
+    error.textContent = codigo ? (MENSAJES[codigo] ?? MENSAJES.servidor) : '';
+    input.setAttribute('aria-invalid', codigo ? 'true' : 'false');
+  }
+
+  async function intentar(password: string, silencioso: boolean) {
+    if (!silencioso) {
+      boton.disabled = true;
+      boton.textContent = 'Abriendo…';
+      pintarError(null);
+    }
+
+    const resultado = await unlock(password);
+
+    if (resultado.ok) {
+      guardarPassword(password);
+      publicarBanco(resultado.banco);
+      ocultarGate();
+      return;
+    }
+
+    // Una contraseña guardada que ya no sirve (la cambiaron) manda de vuelta al gate.
+    if (silencioso) {
+      if (resultado.error === 'password') {
+        olvidarPassword();
+        mostrarGate();
+      }
+      // Con un fallo de red preferimos dejar pasar a quien ya había entrado
+      // antes que trabar el sitio por un momento sin señal.
+      return;
+    }
+
+    boton.disabled = false;
+    boton.textContent = 'Entrar';
+    pintarError(resultado.error);
+    input.select();
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const valor = input.value.trim();
+    if (!valor) {
+      pintarError('password');
+      return;
+    }
+    void intentar(valor, false);
+  });
+
+  input.addEventListener('input', () => pintarError(null));
+
+  /**
+   * En `npm run dev`, mientras Apps Script todavía no está publicado, el gate
+   * dejaría el sitio inaccesible y no se podría trabajar. Solo en desarrollo
+   * y solo si el endpoint sigue sin configurar, se salta la puerta y se
+   * inyectan datos bancarios falsos para poder ver la sección de regalos.
+   *
+   * `import.meta.env.DEV` es false en el build de producción, así que este
+   * bloque desaparece del bundle publicado.
+   */
+  const SIN_ENDPOINT = boda.api.endpoint.includes('PEGAR_ID_AQUI');
+
+  if (import.meta.env.DEV && SIN_ENDPOINT) {
+    console.warn('[boda] Endpoint de Apps Script sin configurar: gate omitido en desarrollo.');
+    publicarBanco({
+      titular: 'NOMBRE DE PRUEBA',
+      banco: 'BANCO DE PRUEBA',
+      clabe: '000000000000000000',
+      cuenta: '0000000000',
+      nota: 'Datos de ejemplo: en producción vienen de la pestaña Config.',
+    });
+    ocultarGate();
+  } else {
+    // Al cargar: si ya hay contraseña guardada, entramos de inmediato y
+    // validamos en segundo plano. Si no, se muestra el gate.
+    const guardada = leerPassword();
+    if (guardada) {
+      void intentar(guardada, true);
+    } else {
+      mostrarGate();
+    }
+  }
+</script>
+
+<style>
+  /* Parpadeo de vela sobre el corazón del gate. */
+  @media (prefers-reduced-motion: no-preference) {
+    .gate-vela {
+      animation: vela 4.5s ease-in-out infinite;
+    }
+
+    @keyframes vela {
+      0%,
+      100% {
+        opacity: 0.85;
+        filter: drop-shadow(0 0 18px rgba(142, 17, 22, 0.55));
+      }
+      42% {
+        opacity: 1;
+        filter: drop-shadow(0 0 34px rgba(194, 50, 58, 0.7));
+      }
+      58% {
+        opacity: 0.78;
+        filter: drop-shadow(0 0 12px rgba(142, 17, 22, 0.4));
+      }
+    }
+  }
+</style>

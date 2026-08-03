@@ -1,0 +1,34 @@
+---
+import { boda } from '../config/boda';
+import Ornamento from './Ornamento.astro';
+---
+
+<footer class="vineta bg-ink relative overflow-hidden px-5 py-24 text-center">
+  <div class="absolute inset-x-0 top-0 filete" aria-hidden="true"></div>
+
+  <div class="relative mx-auto max-w-xl">
+    <Ornamento tipo="corazon" class="text-blood/55 mx-auto mb-9 h-16 w-16" />
+
+    <p class="font-display text-bone text-[clamp(2.5rem,9vw,4rem)] leading-none">
+      {boda.novios.monograma}
+    </p>
+
+    <div class="my-8 flex items-center justify-center gap-4" aria-hidden="true">
+      <span class="filete w-14"></span>
+      <Ornamento tipo="rombo" class="text-brass h-3 w-3 shrink-0" />
+      <span class="filete w-14"></span>
+    </div>
+
+    <p class="text-bone font-mono text-[0.6875rem] tracking-[0.32em] uppercase">
+      {boda.fecha.displayCorto}
+    </p>
+
+    <p class="text-ash mt-3 font-mono text-[0.625rem] tracking-[0.22em] uppercase">
+      {boda.venue.nombre} · Ciudad de México
+    </p>
+
+    <div class="mt-12 flex justify-center">
+      <Ornamento tipo="murcielago" class="text-brass/40 h-7 w-auto" />
+    </div>
+  </div>
+</footer>
