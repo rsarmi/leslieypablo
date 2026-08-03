@@ -61,7 +61,7 @@ export const boda = {
 
   regalos: {
     intro:
-      'Su presencia es el regalo pero si además quieren consentirnos, la forma más útil para nosotros es una transferencia.',
+      'Su presencia es el regalo, pero si además quieren apoyarnos para nuestro viaje de luna de miel a las Islas de Pascua, la forma más útil para nosotros es una transferencia.',
     nota: 'Los datos aparecen aquí una vez que entraron con la contraseña.',
   },
 
