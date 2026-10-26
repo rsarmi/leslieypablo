@@ -18,6 +18,12 @@ const TIMEOUT_MS = 25_000;
 /** Versionada: si algún día cambia la contraseña, subir el número invalida a todos. */
 const CLAVE_STORAGE = 'boda-lp:v1:pass';
 
+/**
+ * Ya no se pide contraseña a los invitados: el sitio la manda sola al servidor.
+ * Queda visible en el bundle público; nunca protegió nada crítico.
+ */
+const PASSWORD_INVITADOS = 'leslieypablo3000';
+
 export interface DatosBanco {
   titular: string;
   banco: string;
@@ -78,13 +84,8 @@ export interface DatosConfirmacion {
  * WhatsApp varias veces a lo largo de meses y no queremos que reescriban la
  * contraseña cada vez. La contraseña no protege nada crítico.
  */
-export function leerPassword(): string | null {
-  try {
-    return localStorage.getItem(CLAVE_STORAGE);
-  } catch {
-    // Safari en privado tira al tocar localStorage.
-    return null;
-  }
+export function leerPassword(): string {
+  return PASSWORD_INVITADOS;
 }
 
 export function guardarPassword(password: string): void {
